@@ -1,35 +1,35 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { OilSection } from './components/monitoring/OilSection/OilSection';
+import { OxygenSection } from './components/monitoring/OxygenSection/OxygenSection';
+import { StatusSection } from './components/monitoring/StatusSection/StatusSection';
+import { TemperatureSection } from './components/monitoring/TemperatureSection/TemperatureSection';
+import { useMonitoringData } from './hooks/useMonitoringData';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { oilData, oxygenData, temperatureData, statusData, error, isLoading } = useMonitoringData();
+
+  if (error) {
+    return (
+      <div className="p-5 bg-gray-100 min-h-screen">
+        <div className="p-5 m-5 bg-red-50 text-red-800 rounded-lg border border-red-200">
+          Error: {error.message}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="p-5 bg-gray-100 min-h-screen">
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center text-white text-2xl z-50">
+          Loading...
+        </div>
+      )}
+      <OilSection data={oilData} />
+      <OxygenSection data={oxygenData} />
+      <TemperatureSection data={temperatureData} />
+      <StatusSection data={statusData} />
+    </div>
+  );
 }
 
-export default App
+export default App;
