@@ -1,6 +1,6 @@
+import { Card, CardContent } from '@/components/ui/card';
+import { StatusData } from '@/types/monitoring';
 import React from 'react';
-import { StatusData } from '../../../types/monitoring';
-import { Card, CardContent } from '../../ui/card';
 
 interface StatusSectionProps {
   data: StatusData[];

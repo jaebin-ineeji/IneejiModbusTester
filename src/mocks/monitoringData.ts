@@ -1,4 +1,4 @@
-import { OilData, OxygenData, Position, StatusData, TemperatureData } from '../types/monitoring';
+import { OilData, OxygenData, Position, StatusData, TemperatureData } from '@/types/monitoring';
 
 export const mockOilData: OilData[] = [
   { position: '1L' as Position, pv: 90.1, sv: 90.0, rt: 1.00, mv: 31.1, rl: 'LOCAL', am: 'AUTO' },

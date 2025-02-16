@@ -1,6 +1,6 @@
+import { MonitoringBox } from '@/components/common/MonitoringBox';
+import { OxygenData } from '@/types/monitoring';
 import React from 'react';
-import { OxygenData } from '../../../types/monitoring';
-import { MonitoringBox } from '../../common/MonitoringBox';
 
 interface OxygenSectionProps {
   data: OxygenData[];

@@ -1,6 +1,6 @@
+import { fetchOilData, fetchOxygenData, fetchStatusData, fetchTemperatureData } from '@/services/api';
+import { OilData, OxygenData, StatusData, TemperatureData } from '@/types/monitoring';
 import { useEffect, useState } from 'react';
-import { fetchOilData, fetchOxygenData, fetchStatusData, fetchTemperatureData } from '../services/api';
-import { OilData, OxygenData, StatusData, TemperatureData } from '../types/monitoring';
 
 interface MonitoringData {
   oilData: OilData[];

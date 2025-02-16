@@ -1,6 +1,6 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ControlMode, MonitoringData } from '@/types/monitoring';
 import React from 'react';
-import { ControlMode, MonitoringData } from '../../types/monitoring';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 interface MonitoringBoxProps extends MonitoringData, Partial<ControlMode> {
   title: string;

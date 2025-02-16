@@ -1,6 +1,6 @@
+import { MonitoringBox } from '@/components/common/MonitoringBox';
+import { OilData } from '@/types/monitoring';
 import React from 'react';
-import { OilData } from '../../../types/monitoring';
-import { MonitoringBox } from '../../common/MonitoringBox';
 
 interface OilSectionProps {
   data: OilData[];

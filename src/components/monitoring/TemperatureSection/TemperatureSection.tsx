@@ -1,6 +1,6 @@
+import { Card, CardContent } from '@/components/ui/card';
+import { TemperatureData } from '@/types/monitoring';
 import React from 'react';
-import { TemperatureData } from '../../../types/monitoring';
-import { Card, CardContent } from '../../ui/card';
 
 interface TemperatureSectionProps {
   data: TemperatureData[];
