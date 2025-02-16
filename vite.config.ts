@@ -1,9 +1,17 @@
 import react from '@vitejs/plugin-react-swc'
+import autoprefixer from 'autoprefixer'
 import path from 'path'
+import tailwindcss from 'tailwindcss'
 import { defineConfig } from 'vite'
+import tsconfigPaths from 'vite-tsconfig-paths'
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tsconfigPaths()],
+  css: {
+    postcss: {
+      plugins: [tailwindcss, autoprefixer],
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
