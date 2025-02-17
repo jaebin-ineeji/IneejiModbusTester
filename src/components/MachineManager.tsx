@@ -1,26 +1,27 @@
 import { useEffect, useState } from 'react';
 import { machineApi } from '../services/api';
-import { MachineConfig, MonitoringRequest } from '../types/monitoring';
+import { useMachineStore } from '../store/machine';
+import { MonitoringRequest } from '../types/monitoring';
 
 interface MachineManagerProps {
-  selectedMachines: string[];
   onMachinesChange: (request: MonitoringRequest) => void;
 }
 
-interface MachineTagsMap {
-  [machine: string]: {
-    config: MachineConfig;
-    selectedTags: string[];
-  };
-}
-
-export function MachineManager({ selectedMachines, onMachinesChange }: MachineManagerProps) {
+export function MachineManager({ onMachinesChange }: MachineManagerProps) {
   const [availableMachines, setAvailableMachines] = useState<string[]>([]);
-  const [machineTagsMap, setMachineTagsMap] = useState<MachineTagsMap>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedMachinesList, setSelectedMachinesList] = useState<string[]>(selectedMachines);
+
+  const {
+    selectedMachines,
+    machineTagsMap,
+    setSelectedMachines,
+    updateMachineConfig,
+    updateSelectedTags,
+    removeMachine,
+    updateMonitoringRequest
+  } = useMachineStore();
 
   useEffect(() => {
     const fetchMachines = async () => {
@@ -40,31 +41,23 @@ export function MachineManager({ selectedMachines, onMachinesChange }: MachineMa
   }, []);
 
   const handleToggleMachine = async (machine: string) => {
-    const isSelected = selectedMachinesList.includes(machine);
+    const isSelected = selectedMachines.includes(machine);
     let newSelectedMachines: string[];
     
     if (isSelected) {
-      newSelectedMachines = selectedMachinesList.filter(m => m !== machine);
-      const newMachineTagsMap = { ...machineTagsMap };
-      delete newMachineTagsMap[machine];
-      setMachineTagsMap(newMachineTagsMap);
+      newSelectedMachines = selectedMachines.filter(m => m !== machine);
+      removeMachine(machine);
     } else {
-      newSelectedMachines = [...selectedMachinesList, machine];
+      newSelectedMachines = [...selectedMachines, machine];
       try {
         const config = await machineApi.getMachineConfig(machine);
-        setMachineTagsMap(prev => ({
-          ...prev,
-          [machine]: {
-            config,
-            selectedTags: ['PV', 'SV', 'RT', 'MV', 'RM', 'AM'] // 기본 태그 설정
-          }
-        }));
+        updateMachineConfig(machine, config);
       } catch (error) {
         console.error(`${machine} 설정을 가져오는데 실패했습니다:`, error);
       }
     }
     
-    setSelectedMachinesList(newSelectedMachines);
+    setSelectedMachines(newSelectedMachines);
   };
 
   const handleToggleTag = (machine: string, tag: string) => {
@@ -76,13 +69,7 @@ export function MachineManager({ selectedMachines, onMachinesChange }: MachineMa
       ? machineData.selectedTags.filter(t => t !== tag)
       : [...machineData.selectedTags, tag];
 
-    setMachineTagsMap(prev => ({
-      ...prev,
-      [machine]: {
-        ...prev[machine],
-        selectedTags: newTags
-      }
-    }));
+    updateSelectedTags(machine, newTags);
   };
 
   const handleApply = () => {
@@ -90,6 +77,7 @@ export function MachineManager({ selectedMachines, onMachinesChange }: MachineMa
     Object.entries(machineTagsMap).forEach(([machine, { selectedTags }]) => {
       newRequest[machine] = selectedTags;
     });
+    updateMonitoringRequest(newRequest);
     onMachinesChange(newRequest);
     setIsOpen(false);
   };
@@ -131,7 +119,7 @@ export function MachineManager({ selectedMachines, onMachinesChange }: MachineMa
                     <input
                       type="checkbox"
                       id={machine}
-                      checked={selectedMachinesList.includes(machine)}
+                      checked={selectedMachines.includes(machine)}
                       onChange={() => handleToggleMachine(machine)}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
@@ -145,7 +133,7 @@ export function MachineManager({ selectedMachines, onMachinesChange }: MachineMa
               {/* 태그 목록 */}
               <div className="flex-1 overflow-y-auto">
                 <h4 className="font-medium mb-2">태그 설정</h4>
-                {selectedMachinesList.map(machine => {
+                {selectedMachines.map(machine => {
                   const machineData = machineTagsMap[machine];
                   if (!machineData) return null;
 

@@ -1,24 +1,80 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import './App.css';
 import { MachineManager } from './components/MachineManager';
 import { useWebSocket } from './hooks/useWebSocket';
 import { machineApi } from './services/api';
+import { useMachineStore } from './store/machine';
 import { MonitoringRequest } from './types/monitoring';
 
 function App() {
-  const [selectedMachines, setSelectedMachines] = useState<string[]>([]);
-  const [monitoringRequest, setMonitoringRequest] = useState<MonitoringRequest>({});
+  const { 
+    selectedMachines,
+    monitoringRequest,
+    machineTagsMap,
+    setSelectedMachines,
+    updateMonitoringRequest,
+    updateMachineConfig,
+  } = useMachineStore();
+  
   const { data, error, isConnected } = useWebSocket(monitoringRequest);
 
   useEffect(() => {
     const fetchInitialMachines = async () => {
       try {
         const machines = await machineApi.getMachineList();
-        // 기본적으로 OIL과 관련된 기계들만 선택
-        const defaultMachines = machines.filter(m => 
-          m.startsWith('OIL_') || m === 'CRW_TEMP' || m === 'ID_FAN'
-        );
-        setSelectedMachines(defaultMachines);
+        
+        // 저장된 기계 정보가 있는 경우
+        if (selectedMachines.length > 0 && Object.keys(machineTagsMap).length > 0) {
+          // 저장된 기계들의 설정 정보 다시 불러오기
+          const configPromises = selectedMachines.map(async (machine) => {
+            if (!machineTagsMap[machine]?.config) {
+              try {
+                const config = await machineApi.getMachineConfig(machine);
+                updateMachineConfig(machine, config);
+              } catch (error) {
+                console.error(`${machine} 설정을 가져오는데 실패했습니다:`, error);
+              }
+            }
+          });
+          
+          await Promise.all(configPromises);
+          
+          // 저장된 모니터링 요청이 있다면 그대로 사용
+          if (Object.keys(monitoringRequest).length === 0) {
+            const newRequest: MonitoringRequest = {};
+            Object.entries(machineTagsMap).forEach(([machine, { selectedTags }]) => {
+              newRequest[machine] = selectedTags;
+            });
+            updateMonitoringRequest(newRequest);
+          }
+        } else {
+          // 기본적으로 OIL과 관련된 기계들만 선택
+          const defaultMachines = machines.filter(m => 
+            m.startsWith('OIL_') || m === 'CRW_TEMP' || m === 'ID_FAN'
+          );
+          setSelectedMachines(defaultMachines);
+          
+          // 기본 선택된 기계들의 설정 가져오기
+          const configPromises = defaultMachines.map(async (machine) => {
+            try {
+              const config = await machineApi.getMachineConfig(machine);
+              updateMachineConfig(machine, config);
+            } catch (error) {
+              console.error(`${machine} 설정을 가져오는데 실패했습니다:`, error);
+            }
+          });
+          
+          await Promise.all(configPromises);
+          
+          // 기본 태그로 모니터링 요청 생성
+          const newRequest: MonitoringRequest = {};
+          defaultMachines.forEach(machine => {
+            if (machineTagsMap[machine]) {
+              newRequest[machine] = machineTagsMap[machine].selectedTags;
+            }
+          });
+          updateMonitoringRequest(newRequest);
+        }
       } catch (error) {
         console.error('초기 기계 목록을 가져오는데 실패했습니다:', error);
       }
@@ -28,7 +84,7 @@ function App() {
   }, []);
 
   const handleMonitoringRequestChange = (newRequest: MonitoringRequest) => {
-    setMonitoringRequest(newRequest);
+    updateMonitoringRequest(newRequest);
     setSelectedMachines(Object.keys(newRequest));
   };
 
@@ -147,7 +203,6 @@ function App() {
             {isConnected ? '연결됨' : '연결 끊김'}
           </div>
           <MachineManager
-            selectedMachines={selectedMachines}
             onMachinesChange={handleMonitoringRequestChange}
           />
         </div>
