@@ -11,21 +11,27 @@ export interface MonitoringData {
   [key: string]: MachineData;
 }
 
-export interface WebSocketResponse {
-  success: boolean;
-  message: string;
-  data: MonitoringData;
-}
-
 export interface MonitoringRequest {
   [key: string]: string[];
 }
 
-export interface MachineTag {
-  tag_type: string;
+export enum TagType {
+  ANALOG = "Analog",
+  DIGITAL = "Digital",
+  DIGITAL_AM = "DigitalAM",
+  DIGITAL_RM = "DigitalRM"
+}
+
+export enum Permission {
+  READ = "Read",
+  READ_WRITE = "ReadWrite"
+}
+
+export interface TagConfig {
+  tag_type: TagType;
   logical_register: string;
   real_register: string;
-  permission: 'Read' | 'ReadWrite';
+  permission: Permission;
 }
 
 export interface MachineConfig {
@@ -33,8 +39,21 @@ export interface MachineConfig {
   port: number;
   slave: number;
   tags: {
-    [key: string]: MachineTag;
+    [key: string]: TagConfig;
   };
+}
+
+export interface WebSocketResponse {
+  success: boolean;
+  message: string;
+  data: MonitoringData;
+}
+
+export interface MachineTag {
+  tag_type: string;
+  logical_register: string;
+  real_register: string;
+  permission: 'Read' | 'ReadWrite';
 }
 
 export interface ControlMode {

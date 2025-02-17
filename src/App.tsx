@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
+import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import { MachineManager } from './components/MachineManager';
 import { useWebSocket } from './hooks/useWebSocket';
+import { Settings } from './pages/Settings';
 import { machineApi } from './services/api';
 import { useMachineStore } from './store/machine';
 import { MonitoringRequest } from './types/monitoring';
 
-function App() {
+function MonitoringPage() {
   const { 
     selectedMachines,
     monitoringRequest,
@@ -102,7 +104,7 @@ function App() {
       return 'bg-gray-600';
     };
 
-    const renderValue = (label: string, value: number | string | undefined | null, color: string = 'text-black', format: (v: number) => string = v => v?.toFixed(1)) => {
+    const renderValue = (label: string, value: number | string | undefined | null, color: string = 'text-black', format: (v: number) => string = v => v?.toFixed(0)) => {
       if (value === undefined || value === null) {
         return (
           <div className="flex justify-between">
@@ -202,6 +204,12 @@ function App() {
           <div className={`px-3 py-1 rounded ${isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
             {isConnected ? '연결됨' : '연결 끊김'}
           </div>
+          <Link
+            to="/settings"
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          >
+            설정
+          </Link>
           <MachineManager
             onMachinesChange={handleMonitoringRequestChange}
           />
@@ -216,6 +224,17 @@ function App() {
 
       {renderMachineGrid()}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<MonitoringPage />} />
+        <Route path="/settings" element={<Settings />} />
+      </Routes>
+    </Router>
   );
 }
 

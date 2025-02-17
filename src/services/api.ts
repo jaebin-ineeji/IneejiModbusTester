@@ -24,29 +24,15 @@
 //   return mockStatusData;
 // };
 
+import { MachineConfig, TagConfig } from '../types/monitoring';
+
+const BASE_URL = 'http://localhost:4444';
+
 interface ApiResponse<T> {
   success: boolean;
   message: string;
   data: T;
 }
-
-interface MachineTag {
-  tag_type: string;
-  logical_register: string;
-  real_register: string;
-  permission: 'Read' | 'ReadWrite';
-}
-
-interface MachineConfig {
-  ip: string;
-  port: number;
-  slave: number;
-  tags: {
-    [key: string]: MachineTag;
-  };
-}
-
-const BASE_URL = 'http://localhost:4444';
 
 export const machineApi = {
   async getMachineList(): Promise<string[]> {
@@ -65,5 +51,84 @@ export const machineApi = {
       throw new Error(data.message);
     }
     return data.data;
-  }
+  },
+
+  async addMachine(machineName: string, config: MachineConfig): Promise<void> {
+    const response = await fetch(`${BASE_URL}/machine/${machineName}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(config),
+    });
+    const data: ApiResponse<void> = await response.json();
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+  },
+
+  async deleteMachine(machineName: string): Promise<void> {
+    const response = await fetch(`${BASE_URL}/machine/${machineName}`, {
+      method: 'DELETE',
+    });
+    const data: ApiResponse<void> = await response.json();
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+  },
+
+  async addMachineTag(
+    machineName: string,
+    tagName: string,
+    config: TagConfig
+  ): Promise<void> {
+    const response = await fetch(
+      `${BASE_URL}/machine/${machineName}/tag/${tagName}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config),
+      }
+    );
+    const data: ApiResponse<void> = await response.json();
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+  },
+
+  async updateMachineTag(
+    machineName: string,
+    tagName: string,
+    config: TagConfig
+  ): Promise<void> {
+    const response = await fetch(
+      `${BASE_URL}/machine/${machineName}/tag/${tagName}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config),
+      }
+    );
+    const data: ApiResponse<void> = await response.json();
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+  },
+
+  async deleteMachineTag(machineName: string, tagName: string): Promise<void> {
+    const response = await fetch(
+      `${BASE_URL}/machine/${machineName}/tag/${tagName}`,
+      {
+        method: 'DELETE',
+      }
+    );
+    const data: ApiResponse<void> = await response.json();
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+  },
 }; 
