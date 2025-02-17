@@ -1,3 +1,4 @@
+import { useMachineStore } from '@/store/machine';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { machineApi } from '../services/api';
@@ -27,7 +28,8 @@ export function Settings() {
   const [isEditingTag, setIsEditingTag] = useState(false);
   const [selectedTag, setSelectedTag] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-
+  const { updateMachineConfig, updateDeleteMachineConfig } = useMachineStore();
+  
   const [machineForm, setMachineForm] = useState<MachineFormData>({
     name: '',
     ip: '',
@@ -99,6 +101,8 @@ export function Settings() {
     if (!selectedMachine) return;
     try {
       await machineApi.deleteMachine(selectedMachine);
+      const newConfig = await machineApi.getMachineConfig(selectedMachine);
+      updateDeleteMachineConfig(selectedMachine, newConfig);
       setSelectedMachine('');
       setMachineConfig(null);
       fetchMachines();
@@ -117,6 +121,8 @@ export function Settings() {
         real_register: tagForm.real_register,
         permission: tagForm.permission,
       });
+      const newConfig = await machineApi.getMachineConfig(selectedMachine);
+      updateMachineConfig(selectedMachine, newConfig);
       setIsAddingTag(false);
       setTagForm({
         name: '',
@@ -161,6 +167,8 @@ export function Settings() {
     if (!selectedMachine) return;
     try {
       await machineApi.deleteMachineTag(selectedMachine, tagName);
+      const newConfig = await machineApi.getMachineConfig(selectedMachine);
+      updateDeleteMachineConfig(selectedMachine, newConfig);
       fetchMachineConfig();
       setError(null);
     } catch (err) {

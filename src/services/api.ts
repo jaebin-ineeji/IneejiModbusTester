@@ -35,6 +35,7 @@ interface ApiResponse<T> {
 }
 
 export const machineApi = {
+  // 기계 목록 조회
   async getMachineList(): Promise<string[]> {
     const response = await fetch(`${BASE_URL}/machine`);
     const data: ApiResponse<string[]> = await response.json();
@@ -44,6 +45,7 @@ export const machineApi = {
     return data.data;
   },
 
+  // 기계 설정 조회
   async getMachineConfig(machineName: string): Promise<MachineConfig> {
     const response = await fetch(`${BASE_URL}/machine/${machineName}`);
     const data: ApiResponse<MachineConfig> = await response.json();
@@ -53,6 +55,7 @@ export const machineApi = {
     return data.data;
   },
 
+  // 기계 추가
   async addMachine(machineName: string, config: MachineConfig): Promise<void> {
     const response = await fetch(`${BASE_URL}/machine/${machineName}`, {
       method: 'POST',
@@ -82,8 +85,9 @@ export const machineApi = {
     tagName: string,
     config: TagConfig
   ): Promise<void> {
+    const params = new URLSearchParams({ tag_name: tagName });
     const response = await fetch(
-      `${BASE_URL}/machine/${machineName}/tag/${tagName}`,
+      `${BASE_URL}/machine/${machineName}/tags?${params.toString()}`,
       {
         method: 'POST',
         headers: {
@@ -104,7 +108,7 @@ export const machineApi = {
     config: TagConfig
   ): Promise<void> {
     const response = await fetch(
-      `${BASE_URL}/machine/${machineName}/tag/${tagName}`,
+      `${BASE_URL}/machine/${machineName}/tags/${tagName}`,
       {
         method: 'PUT',
         headers: {
@@ -121,7 +125,7 @@ export const machineApi = {
 
   async deleteMachineTag(machineName: string, tagName: string): Promise<void> {
     const response = await fetch(
-      `${BASE_URL}/machine/${machineName}/tag/${tagName}`,
+      `${BASE_URL}/machine/${machineName}/tags/${tagName}`,
       {
         method: 'DELETE',
       }

@@ -49,11 +49,14 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
       newSelectedMachines = selectedMachines.filter(m => m !== machine);
       removeMachine(machine);
     } else {
-      newSelectedMachines = [...selectedMachines, machine];
       try {
         const config = await machineApi.getMachineConfig(machine);
+        const availableTags = ['RM', 'AM', 'PV', 'SV', 'RT', 'MV'].filter(tag => 
+          config.tags[tag]
+        );
+        newSelectedMachines = [...selectedMachines, machine];
         updateMachineConfig(machine, config);
-        updateSelectedTags(machine, ['RM', 'AM', 'PV', 'SV', 'RT', 'MV']);
+        updateSelectedTags(machine, availableTags);
       } catch (error) {
         console.error(`${machine} 설정을 가져오는데 실패했습니다:`, error);
         return;

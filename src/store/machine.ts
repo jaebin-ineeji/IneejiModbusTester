@@ -10,6 +10,7 @@ interface MachineStore {
   isLayoutMode: boolean;
   setSelectedMachines: (machines: string[]) => void;
   updateMachineConfig: (machine: string, config: MachineConfig) => void;
+  updateDeleteMachineConfig: (machine: string, config: MachineConfig) => void;
   updateSelectedTags: (machine: string, tags: string[]) => void;
   removeMachine: (machine: string) => void;
   updateMonitoringRequest: (request: MonitoringRequest) => void;
@@ -39,7 +40,26 @@ export const useMachineStore = create<MachineStore>()(
             },
           },
         })),
-      
+      updateDeleteMachineConfig: (machine, config) =>
+        set((state) => {
+          // 새로운 config의 태그 키들을 Set으로 만듭니다
+          const newTagKeys = new Set(Object.keys(config.tags));
+
+          // 기존 selectedTags 중에서 새로운 config에 존재하는 태그만 필터링합니다
+          const filteredSelectedTags = state.machineTagsMap[machine].selectedTags.filter(
+            tag => newTagKeys.has(tag)
+          );
+          return {
+            machineTagsMap: {
+              ...state.machineTagsMap,
+              [machine]: {
+              config,
+                selectedTags: filteredSelectedTags,
+              },
+            },
+          };
+        }),
+
       updateSelectedTags: (machine, tags) =>
         set((state) => ({
           machineTagsMap: {
