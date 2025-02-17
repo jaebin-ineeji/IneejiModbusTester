@@ -37,8 +37,10 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
       }
     };
 
-    fetchMachines();
-  }, []);
+    if (isOpen) {
+      fetchMachines();
+    }
+  }, [isOpen]);
 
   const handleToggleMachine = async (machine: string) => {
     const isSelected = selectedMachines.includes(machine);
@@ -52,8 +54,10 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
       try {
         const config = await machineApi.getMachineConfig(machine);
         updateMachineConfig(machine, config);
+        updateSelectedTags(machine, ['PV', 'SV', 'RT', 'MV', 'RM', 'AM']);
       } catch (error) {
         console.error(`${machine} 설정을 가져오는데 실패했습니다:`, error);
+        return;
       }
     }
     
@@ -62,12 +66,13 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
 
   const handleToggleTag = (machine: string, tag: string) => {
     const machineData = machineTagsMap[machine];
-    if (!machineData) return;
+    if (!machineData?.config) return;
 
-    const isSelected = machineData.selectedTags.includes(tag);
+    const selectedTags = machineData.selectedTags || [];
+    const isSelected = selectedTags.includes(tag);
     const newTags = isSelected
-      ? machineData.selectedTags.filter(t => t !== tag)
-      : [...machineData.selectedTags, tag];
+      ? selectedTags.filter(t => t !== tag)
+      : [...selectedTags, tag];
 
     updateSelectedTags(machine, newTags);
   };
@@ -88,14 +93,14 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
   return (
     <div className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen(true)}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
         기계 관리
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-[800px] max-h-[80vh] overflow-hidden flex flex-col">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium">기계 및 태그 설정</h3>
@@ -135,7 +140,9 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
                 <h4 className="font-medium mb-2">태그 설정</h4>
                 {selectedMachines.map(machine => {
                   const machineData = machineTagsMap[machine];
-                  if (!machineData) return null;
+                  if (!machineData?.config) return null;
+
+                  const selectedTags = machineData.selectedTags || [];
 
                   return (
                     <div key={machine} className="mb-4">
@@ -146,7 +153,7 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
                             <input
                               type="checkbox"
                               id={`${machine}-${tag}`}
-                              checked={machineData.selectedTags.includes(tag)}
+                              checked={selectedTags.includes(tag)}
                               onChange={() => handleToggleTag(machine, tag)}
                               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                             />

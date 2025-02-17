@@ -75,4 +75,24 @@ export interface StatusData {
   name: string;
   value: number;
   unit: string;
+}
+
+export type MachineSection = 'main' | 'left' | 'right' | 'others';
+
+export interface MachineLayout {
+  main: string[];
+  left: string[];
+  right: string[];
+  others: string[];
+}
+
+export interface MachinePosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface MachinePositions {
+  [key: string]: MachinePosition;
 } 

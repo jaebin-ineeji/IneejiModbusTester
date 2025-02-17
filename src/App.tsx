@@ -17,6 +17,9 @@ function MonitoringPage() {
     setSelectedMachines,
     updateMonitoringRequest,
     updateMachineConfig,
+    updateMachinePositions,
+    isLayoutMode,
+    setIsLayoutMode,
   } = useMachineStore();
   
   const { data, error, isConnected } = useWebSocket(monitoringRequest);
@@ -71,6 +74,21 @@ function MonitoringPage() {
     );
     setSelectedMachines(defaultMachines);
     
+    // 기본 위치 설정
+    const defaultPositions: Record<string, { x: number; y: number; width: number; height: number }> = {};
+    defaultMachines.forEach((machine, index) => {
+      // 그리드 형태로 초기 배치
+      const row = Math.floor(index / 3);
+      const col = index % 3;
+      defaultPositions[machine] = {
+        x: col * 220, // 여백 포함 너비
+        y: row * 170, // 여백 포함 높이
+        width: 150,
+        height: 150
+      };
+    });
+    updateMachinePositions(defaultPositions);
+    
     const configPromises = defaultMachines.map(async (machine) => {
       try {
         const config = await machineApi.getMachineConfig(machine);
@@ -113,6 +131,12 @@ function MonitoringPage() {
           <MachineManager
             onMachinesChange={handleMonitoringRequestChange}
           />
+          <button
+            onClick={() => setIsLayoutMode(!isLayoutMode)}
+            className={`px-4 py-2 ${isLayoutMode ? 'bg-blue-600' : 'bg-blue-500'} text-white rounded hover:bg-blue-600`}
+          >
+            {isLayoutMode ? '레이아웃 수정 완료' : '레이아웃 수정'}
+          </button>
         </div>
       </div>
 
@@ -123,9 +147,9 @@ function MonitoringPage() {
       )}
 
       <MonitoringGrid
-        selectedMachines={selectedMachines}
         data={data}
         isConnected={isConnected}
+        isLayoutMode={isLayoutMode}
       />
     </div>
   );

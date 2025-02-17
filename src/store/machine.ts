@@ -1,24 +1,21 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { MachineConfig, MonitoringRequest } from '../types/monitoring';
-
-interface MachineTagsMap {
-  [machine: string]: {
-    config: MachineConfig;
-    selectedTags: string[];
-  };
-}
+import { MachineConfig, MachinePosition, MachinePositions, MonitoringRequest } from '../types/monitoring';
 
 interface MachineStore {
   selectedMachines: string[];
-  machineTagsMap: MachineTagsMap;
+  machineTagsMap: Record<string, { selectedTags: string[]; config?: MachineConfig }>;
   monitoringRequest: MonitoringRequest;
+  machinePositions: MachinePositions;
+  isLayoutMode: boolean;
   setSelectedMachines: (machines: string[]) => void;
-  setMachineTagsMap: (map: MachineTagsMap) => void;
   updateMachineConfig: (machine: string, config: MachineConfig) => void;
   updateSelectedTags: (machine: string, tags: string[]) => void;
   removeMachine: (machine: string) => void;
   updateMonitoringRequest: (request: MonitoringRequest) => void;
+  updateMachinePosition: (machine: string, position: MachinePosition) => void;
+  updateMachinePositions: (positions: MachinePositions) => void;
+  setIsLayoutMode: (isLayoutMode: boolean) => void;
 }
 
 export const useMachineStore = create<MachineStore>()(
@@ -27,18 +24,18 @@ export const useMachineStore = create<MachineStore>()(
       selectedMachines: [],
       machineTagsMap: {},
       monitoringRequest: {},
+      machinePositions: {},
+      isLayoutMode: false,
 
       setSelectedMachines: (machines) => set({ selectedMachines: machines }),
-      
-      setMachineTagsMap: (map) => set({ machineTagsMap: map }),
       
       updateMachineConfig: (machine, config) =>
         set((state) => ({
           machineTagsMap: {
             ...state.machineTagsMap,
             [machine]: {
+              ...state.machineTagsMap[machine],
               config,
-              selectedTags: state.machineTagsMap[machine]?.selectedTags || ['PV', 'SV', 'RT', 'MV', 'RM', 'AM'],
             },
           },
         })),
@@ -56,15 +53,35 @@ export const useMachineStore = create<MachineStore>()(
       
       removeMachine: (machine) =>
         set((state) => {
-          const { [machine]: omitted, ...rest } = state.machineTagsMap; // eslint-disable-line @typescript-eslint/no-unused-vars
+          const { [machine]: _, ...rest } = state.machineTagsMap;
+          const { [machine]: __, ...restPositions } = state.machinePositions;
           return {
             machineTagsMap: rest,
-            selectedMachines: state.selectedMachines.filter((m) => m !== machine),
+            machinePositions: restPositions,
+            selectedMachines: state.selectedMachines.filter((m: string) => m !== machine),
           };
         }),
       
       updateMonitoringRequest: (request) =>
         set({ monitoringRequest: request }),
+      
+      updateMachinePosition: (machine, position) =>
+        set((state) => ({
+          machinePositions: {
+            ...state.machinePositions,
+            [machine]: position,
+          },
+        })),
+
+      updateMachinePositions: (positions) =>
+        set((state) => ({
+          machinePositions: {
+            ...state.machinePositions,
+            ...positions,
+          },
+        })),
+
+      setIsLayoutMode: (isLayoutMode) => set({ isLayoutMode }),
     }),
     {
       name: 'machine-storage',
