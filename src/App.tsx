@@ -1,11 +1,9 @@
 import { OilSection } from '@/components/monitoring/OilSection/OilSection';
 import { OxygenSection } from '@/components/monitoring/OxygenSection/OxygenSection';
-import { StatusSection } from '@/components/monitoring/StatusSection/StatusSection';
-import { TemperatureSection } from '@/components/monitoring/TemperatureSection/TemperatureSection';
 import { useMonitoringData } from '@/hooks/useMonitoringData';
 
 function App() {
-  const { oilData, oxygenData, temperatureData, statusData, error, isLoading } = useMonitoringData();
+  const { oilData, oxygenData, error, isLoading } = useMonitoringData();
 
   if (error) {
     return (
@@ -26,8 +24,8 @@ function App() {
       )}
       <OilSection data={oilData} />
       <OxygenSection data={oxygenData} />
-      <TemperatureSection data={temperatureData} />
-      <StatusSection data={statusData} />
+      {/* <TemperatureSection data={temperatureData} />
+      <StatusSection data={statusData} /> */}
     </div>
   );
 }

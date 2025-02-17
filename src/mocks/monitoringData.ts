@@ -1,4 +1,4 @@
-import { OilData, OxygenData, Position, StatusData, TemperatureData } from '@/types/monitoring';
+import { OilData, OxygenData, Position } from '@/types/monitoring';
 
 export const mockOilData: OilData[] = [
   { position: '1L' as Position, pv: 90.1, sv: 90.0, rt: 1.00, mv: 31.1, rl: 'LOCAL', am: 'AUTO' },
@@ -24,19 +24,19 @@ export const mockOxygenData: OxygenData[] = [
   { position: '4R' as Position, pv: 214.2, sv: 215.0, rt: 1.00, mv: 53.7, rl: 'LOCAL', am: 'AUTO' },
 ];
 
-export const mockTemperatureData: TemperatureData[] = [
-  { id: '1', name: 'ARCH #1', value: 0.0, unit: '℃' },
-  { id: '2', name: 'ARCH #2', value: 1488.1, unit: '℃' },
-  { id: '3', name: 'ARCH #3', value: 1550.7, unit: '℃' },
-  { id: '4', name: 'ARCH #4', value: 1548.3, unit: '℃' },
-  { id: '5', name: 'THROAT #5', value: 1060.3, unit: '℃' },
-  { id: '6', name: 'PORT ARCH R #6', value: 0.0, unit: '℃' },
-  { id: '7', name: 'PORT ARCH R #7', value: 1323.3, unit: '℃' },
-  { id: '8', name: 'MELTER BT #8', value: 908.2, unit: '℃' },
-];
+// export const mockTemperatureData: TemperatureData[] = [
+//   { id: '1', name: 'ARCH #1', value: 0.0, unit: '℃' },
+//   { id: '2', name: 'ARCH #2', value: 1488.1, unit: '℃' },
+//   { id: '3', name: 'ARCH #3', value: 1550.7, unit: '℃' },
+//   { id: '4', name: 'ARCH #4', value: 1548.3, unit: '℃' },
+//   { id: '5', name: 'THROAT #5', value: 1060.3, unit: '℃' },
+//   { id: '6', name: 'PORT ARCH R #6', value: 0.0, unit: '℃' },
+//   { id: '7', name: 'PORT ARCH R #7', value: 1323.3, unit: '℃' },
+//   { id: '8', name: 'MELTER BT #8', value: 908.2, unit: '℃' },
+// ];
 
-export const mockStatusData: StatusData[] = [
-  { id: '1', name: '유량', value: 2197.00, unit: 'Nm³/hr' },
-  { id: '2', name: '압력', value: 1.16, unit: 'Barg' },
-  { id: '3', name: '온도', value: 91.89, unit: '%' },
-]; 
+// export const mockStatusData: StatusData[] = [
+//   { id: '1', name: '유량', value: 2197.00, unit: 'Nm³/hr' },
+//   { id: '2', name: '압력', value: 1.16, unit: 'Barg' },
+//   { id: '3', name: '온도', value: 91.89, unit: '%' },
+// ]; 
