@@ -3,10 +3,10 @@ import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import { MachineManager } from './components/MachineManager';
 import { MonitoringGrid } from './components/monitoring/MonitoringGrid';
-import { useWebSocket } from './hooks/useWebSocket';
 import { Settings } from './pages/Settings';
 import { machineApi } from './services/api';
 import { useMachineStore } from './store/machine';
+import { useWebSocketStore } from './store/websocket';
 import { MonitoringRequest } from './types/monitoring';
 
 function MonitoringPage() {
@@ -22,7 +22,22 @@ function MonitoringPage() {
     setIsLayoutMode,
   } = useMachineStore();
   
-  const { data, error, isConnected } = useWebSocket(monitoringRequest);
+  const { isConnected, connect, reconnect, monitoringData, error, sendMessage } = useWebSocketStore();
+
+  useEffect(() => {
+    connect();
+    return () => {
+      // 컴포넌트가 언마운트될 때는 연결을 끊지 않습니다.
+      // 전역 상태로 관리되므로 다른 페이지에서도 연결 상태를 유지합니다.
+    };
+  }, [connect]);
+
+  // 모니터링 요청이 변경될 때마다 웹소켓으로 전송
+  useEffect(() => {
+    if (isConnected && Object.keys(monitoringRequest).length > 0) {
+      sendMessage(monitoringRequest);
+    }
+  }, [monitoringRequest, isConnected, sendMessage]);
 
   useEffect(() => {
     const fetchInitialMachines = async () => {
@@ -119,8 +134,18 @@ function MonitoringPage() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">기계 모니터링 시스템</h1>
         <div className="flex items-center gap-4">
-          <div className={`px-3 py-1 rounded ${isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            {isConnected ? '연결됨' : '연결 끊김'}
+          <div className="flex items-center gap-2">
+            <div className={`px-3 py-1 rounded ${isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              {isConnected ? '연결됨' : '연결 끊김'}
+            </div>
+            {!isConnected && (
+              <button
+                onClick={reconnect}
+                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                재연결
+              </button>
+            )}
           </div>
           <Link
             to="/settings"
@@ -147,7 +172,7 @@ function MonitoringPage() {
       )}
 
       <MonitoringGrid
-        data={data}
+        data={monitoringData?.data || {}}
         isConnected={isConnected}
         isLayoutMode={isLayoutMode}
       />
