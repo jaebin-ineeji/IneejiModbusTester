@@ -1,6 +1,6 @@
+import { useMachineStore } from '@/store/machine';
+import { MachinePosition, MonitoringData } from '@/types/monitoring';
 import React, { useRef, useState } from 'react';
-import { useMachineStore } from '../../store/machine';
-import { MachinePosition, MonitoringData } from '../../types/monitoring';
 import { MonitoringBox } from './MonitoringBox';
 
 interface MonitoringGridProps {
@@ -52,7 +52,7 @@ export const MonitoringGrid = ({ data, isConnected, isLayoutMode }: MonitoringGr
 
     // 그리드 영역을 벗어나지 않도록 위치 조정
     const position: MachinePosition = {
-      x: Math.max(0, Math.min(x, gridRect.width - 200)), // 200은 기계 박스의 예상 너비
+      x: Math.max(0, Math.min(x, gridRect.width - 150)), // 150은 기계 박스의 예상 너비
       y: Math.max(0, Math.min(y, gridRect.height - 150)), // 150은 기계 박스의 예상 높이
       width: 150,
       height: 150
@@ -68,7 +68,7 @@ export const MonitoringGrid = ({ data, isConnected, isLayoutMode }: MonitoringGr
 
     const position = machinePositions[machineName] || {
       x: 0,
-      y: 0,
+      y: selectedMachines.indexOf(machineName) * 40,
       width: 150,
       height: 150
     };

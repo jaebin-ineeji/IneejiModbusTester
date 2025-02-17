@@ -54,7 +54,7 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
       try {
         const config = await machineApi.getMachineConfig(machine);
         updateMachineConfig(machine, config);
-        updateSelectedTags(machine, ['PV', 'SV', 'RT', 'MV', 'RM', 'AM']);
+        updateSelectedTags(machine, ['RM', 'AM', 'PV', 'SV', 'RT', 'MV']);
       } catch (error) {
         console.error(`${machine} 설정을 가져오는데 실패했습니다:`, error);
         return;

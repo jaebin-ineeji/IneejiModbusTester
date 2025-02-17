@@ -8,6 +8,8 @@ export interface MachineData {
   [key: string]: number | string;
 }
 
+export type TagValue = string | number;
+
 export interface MonitoringData {
   [key: string]: MachineData;
 }
