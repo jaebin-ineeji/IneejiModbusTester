@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
+import { ImSpinner } from "react-icons/im";
 import { machineApi } from '../services/api';
 import { useMachineStore } from '../store/machine';
 import { MonitoringRequest } from '../types/monitoring';
-
 interface MachineManagerProps {
   onMachinesChange: (request: MonitoringRequest) => void;
 }
@@ -87,7 +87,7 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
     setIsOpen(false);
   };
 
-  if (loading) return <div className="text-gray-500">로딩 중...</div>;
+  if (loading) return <div className="text-gray-500"><ImSpinner className="animate-spin text-2xl m-2" /></div>;
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
