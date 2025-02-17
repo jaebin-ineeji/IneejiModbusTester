@@ -21,20 +21,28 @@ export interface MonitoringRequest {
   [key: string]: string[];
 }
 
+export interface MachineTag {
+  tag_type: string;
+  logical_register: string;
+  real_register: string;
+  permission: 'Read' | 'ReadWrite';
+}
+
+export interface MachineConfig {
+  ip: string;
+  port: number;
+  slave: number;
+  tags: {
+    [key: string]: MachineTag;
+  };
+}
+
 export interface ControlMode {
   rm: 'LOCAL' | 'REMOTE';
   am: 'AUTO' | 'MANUAL';
 }
 
 export type Position = '1L' | '2L' | '3L' | '4L' | '5L' | '1R' | '2R' | '3R' | '4R';
-
-// export interface OilData extends MonitoringData, ControlMode {
-//   position: Position;
-// }
-
-// export interface OxygenData extends MonitoringData, ControlMode {
-//   position: Position;
-// }
 
 export interface TemperatureData {
   id: string;

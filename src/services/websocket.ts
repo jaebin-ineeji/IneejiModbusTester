@@ -30,10 +30,21 @@ class WebSocketService {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectTimeout = 3000;
+  private connectionCount = 0;
+  private autoReconnect = false;
 
   constructor(private url: string) {}
 
   connect() {
+    this.connectionCount++;
+    
+    if (this.connectionCount === 1) {
+      this.autoReconnect = true;
+      this.initializeConnection();
+    }
+  }
+
+  private initializeConnection() {
     try {
       this.ws = new WebSocket(this.url);
       
@@ -55,7 +66,9 @@ class WebSocketService {
       this.ws.onclose = () => {
         console.log('WebSocket 연결 끊김');
         this.eventEmitter.emit('connection', false);
-        this.attemptReconnect();
+        if (this.autoReconnect) {
+          this.attemptReconnect();
+        }
       };
 
       this.ws.onerror = (error) => {
@@ -69,9 +82,9 @@ class WebSocketService {
   }
 
   private attemptReconnect() {
-    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+    if (this.reconnectAttempts < this.maxReconnectAttempts && this.autoReconnect) {
       this.reconnectAttempts++;
-      setTimeout(() => this.connect(), this.reconnectTimeout);
+      setTimeout(() => this.initializeConnection(), this.reconnectTimeout);
     }
   }
 
@@ -98,10 +111,20 @@ class WebSocketService {
   }
 
   disconnect() {
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
+    this.connectionCount--;
+    
+    if (this.connectionCount === 0) {
+      this.autoReconnect = false;
+      if (this.ws) {
+        this.ws.close();
+        this.ws = null;
+      }
     }
+  }
+
+  // 디버깅 및 테스트용
+  getConnectionCount() {
+    return this.connectionCount;
   }
 }
 
