@@ -42,13 +42,14 @@ function MonitoringPage() {
   useEffect(() => {
     const fetchInitialMachines = async () => {
       try {
-        const machines = await machineApi.getMachineList();
+        // const machines = await machineApi.getMachineList();
         
         if (selectedMachines.length > 0 && Object.keys(machineTagsMap).length > 0) {
           await loadSavedMachineConfigs();
           loadSavedMonitoringRequest();
-        } else {
-          await loadDefaultMachines(machines);
+        } 
+        else {
+          await loadDefaultMachines(selectedMachines);
         }
       } catch (error) {
         console.error('초기 기계 목록을 가져오는데 실패했습니다:', error);
@@ -82,11 +83,12 @@ function MonitoringPage() {
       updateMonitoringRequest(newRequest);
     }
   };
-
+// ?
   const loadDefaultMachines = async (machines: string[]) => {
-    const defaultMachines = machines.filter(m => 
-      m.startsWith('OIL_') || m === 'CRW_TEMP' || m === 'ID_FAN'
-    );
+    const defaultMachines = machines;
+    // machines.filter(m => 
+    //   m.startsWith('OIL_') || m === 'CRW_TEMP' || m === 'ID_FAN'
+    // );
     setSelectedMachines(defaultMachines);
     
     // 기본 위치 설정

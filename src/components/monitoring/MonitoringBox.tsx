@@ -1,3 +1,4 @@
+import { useMachineStore } from '../../store/machine';
 import { MachineData } from '../../types/monitoring';
 import { getBackgroundColor } from '../../utils/machineUtils';
 
@@ -7,20 +8,67 @@ interface MonitoringBoxProps {
   isConnected: boolean;
 }
 
+type TagValue = string | number;
+
+interface TagHandler {
+  format: (value: TagValue) => string;
+  color: (value: TagValue) => string;
+}
+
 export const MonitoringBox = ({ machineName, machineData, isConnected }: MonitoringBoxProps) => {
-  const renderValue = (label: string, value: number | string | undefined | null, color: string = 'text-black', format: (v: number) => string = v => v?.toFixed(0)) => {
+  const { machineTagsMap } = useMachineStore();
+  const selectedTags = machineTagsMap[machineName]?.selectedTags || [];
+
+  const getTagHandler = (tag: string): TagHandler => {
+    switch (tag) {
+      case 'RM':
+        return {
+          format: (v) => String(v),
+          color: (v) => v === 'LOCAL' ? 'text-green-600' : 'text-yellow-600'
+        };
+      case 'AM':
+        return {
+          format: (v) => String(v),
+          color: () => 'text-blue-600'
+        };
+      case 'RT':
+        return {
+          format: (v) => typeof v === 'number' ? v.toFixed(2) : String(v),
+          color: () => 'text-black'
+        };
+      case 'MV':
+        return {
+          format: (v) => typeof v === 'number' ? v.toFixed(0) : String(v),
+          color: () => 'text-orange-500'
+        };
+      default:
+        return {
+          format: (v) => typeof v === 'number' ? v.toFixed(0) : String(v),
+          color: () => 'text-black'
+        };
+    }
+  };
+
+  const renderValue = (tag: string) => {
+    const value = machineData[tag];
+
     if (value === undefined || value === null) {
       return (
-        <div className="flex justify-between">
-          <span>{label}:</span>
-          <span className="text-red-500">태그 없음</span>
+        <div key={tag} className="flex justify-between">
+          <span>{tag}:</span>
+          <span className="text-red-500">loading...</span>
         </div>
       );
     }
+
+    const handler = getTagHandler(tag);
+    const formattedValue = handler.format(value);
+    const color = handler.color(value);
+
     return (
-      <div className="flex justify-between">
-        <span>{label}:</span>
-        <span className={color}>{typeof value === 'number' ? format(value) : value}</span>
+      <div key={tag} className="flex justify-between">
+        <span>{tag}:</span>
+        <span className={color}>{formattedValue}</span>
       </div>
     );
   };
@@ -36,12 +84,7 @@ export const MonitoringBox = ({ machineName, machineData, isConnected }: Monitor
         )}
       </div>
       <div className="text-sm mt-1">
-        {renderValue('R/L', machineData.RM, machineData.RM === 'LOCAL' ? 'text-green-600' : 'text-yellow-600')}
-        {renderValue('A/M', machineData.AM, 'text-blue-600')}
-        {renderValue('PV', machineData.PV)}
-        {renderValue('SV', machineData.SV)}
-        {renderValue('RT', machineData.RT, 'text-black', v => v?.toFixed(2))}
-        {renderValue('MV', machineData.MV, 'text-orange-500')}
+        {selectedTags.map(tag => renderValue(tag))}
       </div>
     </div>
   );
