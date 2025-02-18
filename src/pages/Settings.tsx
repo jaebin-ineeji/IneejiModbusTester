@@ -1,5 +1,4 @@
 import { ConfirmModal } from '@/components/common/ConfirmModal';
-import { Toast } from '@/components/common/Toast';
 import { MachineConfig as MachineConfigComponent } from '@/components/machine/MachineConfig';
 import { MachineList } from '@/components/machine/MachineList';
 import { AddMachineModal } from '@/components/machine/modals/AddMachineModal';
@@ -41,7 +40,7 @@ export function Settings() {
     deleteTag,
   } = useMachineSettings();
 
-  const { toast, showToast, hideToast } = useToast();
+  const { showToast } = useToast();
 
   const [isAddingMachine, setIsAddingMachine] = useState(false);
   const [isAddingTag, setIsAddingTag] = useState(false);
@@ -219,14 +218,6 @@ export function Settings() {
         onConfirm={confirmModal.onConfirm}
         onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
       />
-
-      {toast.isVisible && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
-      )}
     </div>
   );
 } 

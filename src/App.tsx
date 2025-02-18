@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import { MachineManager } from './components/MachineManager';
 import { MonitoringGrid } from './components/monitoring/MonitoringGrid';
@@ -180,10 +182,23 @@ function MonitoringPage() {
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<MonitoringPage />} />
-        <Route path="/settings" element={<Settings />} />
-      </Routes>
+      <div className="App">
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Monitoring</Link>
+            </li>
+            <li>
+              <Link to="/settings">Settings</Link>
+            </li>
+          </ul>
+        </nav>
+        <Routes>
+          <Route path="/" element={<MonitoringPage />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+        <ToastContainer position="top-center" />
+      </div>
     </Router>
   );
 }

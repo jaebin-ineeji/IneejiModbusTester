@@ -1,39 +1,23 @@
-import { ToastType } from '@/components/common/Toast';
-import { useCallback, useState } from 'react';
+import { toast as toastify, ToastPosition } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-interface ToastState {
-  message: string;
-  type: ToastType;
-  isVisible: boolean;
-}
+export type ToastType = 'success' | 'error' | 'info';
 
-const initialToastState: ToastState = {
-  message: '',
-  type: 'info',
-  isVisible: false,
+const toastConfig = {
+  position: 'top-center' as ToastPosition,
+  autoClose: 3000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
 };
 
 export function useToast() {
-  const [toast, setToast] = useState<ToastState>(initialToastState);
-
-  const showToast = useCallback((message: string, type: ToastType = 'info') => {
-    setToast({
-      message,
-      type,
-      isVisible: true,
-    });
-  }, []);
-
-  const hideToast = useCallback(() => {
-    setToast(prev => ({
-      ...prev,
-      isVisible: false,
-    }));
-  }, []);
+  const showToast = (message: string, type: ToastType = 'info') => {
+    toastify[type](message, toastConfig);
+  };
 
   return {
-    toast,
     showToast,
-    hideToast,
   };
 } 
