@@ -34,13 +34,12 @@ export function MachineList({
     AM: '자동/수동 모드',
     PV: '현재 값',
     SV: '설정 값',
-    RT: '잔여 시간',
     MV: '출력 값'
   };
 
   return (
     <div className="flex gap-6 w-full">
-      <div className="w-1/2 flex flex-col max-h-[calc(80vh-8rem)]">
+      <div className="w-1/2 flex flex-col max-h-[calc(75vh-8rem)]">
         <h4 className="font-medium mb-2 flex-shrink-0">기계 목록</h4>
         
         {/* 검색 입력창 */}
@@ -130,7 +129,7 @@ export function MachineList({
 
       {/* 태그 설정 패널 */}
       {selectedMachineForTags && (
-        <div className="w-1/2 flex flex-col max-h-[calc(80vh-8rem)]">
+        <div className="w-1/2 flex flex-col max-h-[calc(75vh-8rem)]">
           <div className="flex justify-between items-center mb-4">
             <h4 className="font-medium">{selectedMachineForTags} 태그 설정</h4>
             <button
@@ -171,7 +170,7 @@ export function MachineList({
                           {tagDescriptions[tag] && (
                             <div className="group relative">
                               <IoSettingsOutline className="text-gray-400 w-4 h-4" />
-                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                              <div className="absolute bottom-2 -right-20 -translate-x-1/2 mb-1 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
                                 {tagDescriptions[tag]}
                               </div>
                             </div>
