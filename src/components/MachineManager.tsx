@@ -39,6 +39,7 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
     };
 
     fetchMachines();
+    handleApply();
   }, []);
 
   const handleToggleMachine = async (machine: string) => {
@@ -55,7 +56,7 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
           config.tags[tag]
         );
         newSelectedMachines = [...selectedMachines, machine];
-        updateMachineConfig(machine, config);
+        updateMachineConfig(machine, config, true);
         updateSelectedTags(machine, availableTags);
       } catch (error) {
         console.error(`${machine} 설정을 가져오는데 실패했습니다:`, error);

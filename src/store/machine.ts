@@ -9,8 +9,9 @@ interface MachineStore {
   machinePositions: MachinePositions;
   isLayoutMode: boolean;
   setSelectedMachines: (machines: string[]) => void;
-  updateMachineConfig: (machine: string, config: MachineConfig) => void;
-  updateDeleteMachineConfig: (machine: string, config: MachineConfig) => void;
+  updateMachineConfig: (machine: string, config: MachineConfig, isSelected?: boolean) => void;
+  deleteMachineTagConfig: (machine: string, config: MachineConfig) => void;
+  deleteMachineConfig: (machine: string) => void;
   updateSelectedTags: (machine: string, tags: string[]) => void;
   removeMachine: (machine: string) => void;
   updateMonitoringRequest: (request: MonitoringRequest) => void;
@@ -30,23 +31,28 @@ export const useMachineStore = create<MachineStore>()(
 
       setSelectedMachines: (machines) => set({ selectedMachines: machines }),
       
-      updateMachineConfig: (machine, config) =>
-        set((state) => ({
-          machineTagsMap: {
-            ...state.machineTagsMap,
-            [machine]: {
-              ...state.machineTagsMap[machine],
-              config,
+      updateMachineConfig: (machine, config, isSelected = false) =>
+        set((state) => {
+          if (!isSelected) {
+            return state;
+          }
+          return {
+            machineTagsMap: {
+              ...state.machineTagsMap,
+              [machine]: {
+                ...state.machineTagsMap[machine],
+                config,
+              },
             },
-          },
-        })),
-      updateDeleteMachineConfig: (machine, config) =>
+          };
+        }),
+      deleteMachineTagConfig: (machine, config) =>
         set((state) => {
           // 새로운 config의 태그 키들을 Set으로 만듭니다
-          const newTagKeys = new Set(Object.keys(config.tags));
-
+          const  newTagKeys = new Set(Object.keys(config.tags));
+          
           // 기존 selectedTags 중에서 새로운 config에 존재하는 태그만 필터링합니다
-          const filteredSelectedTags = state.machineTagsMap[machine].selectedTags.filter(
+          const filteredSelectedTags = state.machineTagsMap[machine].selectedTags?.filter(
             tag => newTagKeys.has(tag)
           );
           return {
@@ -58,6 +64,11 @@ export const useMachineStore = create<MachineStore>()(
               },
             },
           };
+        }),
+      deleteMachineConfig: (machine) =>
+        set((state) => {
+          const { [machine]: _, ...rest } = state.machineTagsMap;
+          return { machineTagsMap: rest };
         }),
 
       updateSelectedTags: (machine, tags) =>
