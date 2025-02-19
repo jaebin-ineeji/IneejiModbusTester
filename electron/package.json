@@ -1,23 +1,31 @@
 {
   "name": "ineeji-modbus-test-app",
   "version": "1.0.0",
-  "author": "Jaebin Sa",
+  "author": {
+    "name": "Jaebin Sa",
+    "email": "jaebin@ineeji.com"
+  },
+  "homepage": "https://ineeji.com",
   "description": "Ineeji Modbus Test App",
   "main": "main.js",
   "type": "commonjs",
-  "devDependencies": {
-    "electron": "^34.2.0",
-    "electron-builder": "^25.1.8"
-  },
   "scripts": {
     "start": "electron .",
-    "build:win": "npm run copy-dist && electron-builder --win",
-    "build:mac": "npm run copy-dist && electron-builder --mac",
-    "build:linux": "npm run copy-dist && electron-builder --linux",
-    "build:all": "npm run copy-dist && electron-builder --win --mac --linux",
+    "build:win": "npm run copy-dist && electron-builder --win --publish always",
+    "build:mac": "npm run copy-dist && electron-builder --mac --publish always",
+    "build:linux": "npm run copy-dist && electron-builder --linux --publish always",
+    "build:all": "npm run copy-dist && electron-builder --win --mac --linux --publish always",
     "copy-dist": "cp -r ../frontend/dist ./dist"
   },
   "build": {
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "jaebin-ineeji",
+        "repo": "IneejiModbusTester",
+        "private": true
+      }
+    ],
     "appId": "ineeji.modbus.test.app",
     "productName": "Ineeji Modbus Tester",
     "files": [
@@ -29,16 +37,33 @@
       "buildResources": "build"
     },
     "win": {
-      "target": ["nsis", "zip"],
+      "target": [
+        "nsis",
+        "zip"
+      ],
       "icon": "build/icon/ineeji_logo.png"
     },
     "mac": {
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "icon": "build/icon/ineeji_logo.icns"
     },
     "linux": {
-      "target": ["AppImage", "deb"],
+      "maintainer": "Jaebin Sa <jaebin@ineeji.com>",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "icon": "build/icon/ineeji_logo.png"
     }
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8"
   }
 }
