@@ -86,9 +86,11 @@ export const useMachineStore = create<MachineStore>()(
         set((state) => {
           const { [machine]: _, ...rest } = state.machineTagsMap;
           const { [machine]: __, ...restPositions } = state.machinePositions;
+          const { [machine]: ___, ...restMonitoringRequest } = state.monitoringRequest;
           return {
             machineTagsMap: rest,
             machinePositions: restPositions,
+            monitoringRequest: restMonitoringRequest,
             selectedMachines: state.selectedMachines.filter((m: string) => m !== machine),
           };
         }),

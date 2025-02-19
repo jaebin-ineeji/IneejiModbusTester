@@ -28,7 +28,7 @@ export function MonitoringPage() {
       // 컴포넌트가 언마운트될 때는 연결을 끊지 않습니다.
       // 전역 상태로 관리되므로 다른 페이지에서도 연결 상태를 유지합니다.
     };
-  }, [connect, isConnected]);
+  }, [connect]);
 
   // 모니터링 요청이 변경될 때마다 웹소켓으로 전송
   useEffect(() => {

@@ -15,7 +15,7 @@ export function useMachineSettings() {
   const [selectedMachine, setSelectedMachine] = useState<string>('');
   const [machineConfig, setMachineConfig] = useState<MachineConfig | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { updateMachineConfig, deleteMachineTagConfig, deleteMachineConfig, setSelectedMachines, selectedMachines } = useMachineStore();
+  const { deleteMachineTagConfig, deleteMachineConfig, updateMachineConfig, setSelectedMachines, selectedMachines, removeMachine } = useMachineStore();
 
   const fetchMachines = useCallback(async () => {
     try {
@@ -70,7 +70,7 @@ export function useMachineSettings() {
       setSelectedMachines(selectedMachines.filter(machine => machine !== machineToDelete));
       setMachineConfig(null);
       deleteMachineConfig(machineToDelete);
-      
+      removeMachine(machineToDelete);
       // 기계 목록 새로고침
       const updatedMachines = await machineApi.getMachineList();
       setMachines(updatedMachines);
@@ -89,7 +89,10 @@ export function useMachineSettings() {
     try {
       await machineApi.addMachineTag(selectedMachine, tagName, tagConfig);
       const newConfig = await machineApi.getMachineConfig(selectedMachine);
-      updateMachineConfig(selectedMachine, newConfig);
+      // 선택된 기계가 있는지 확인
+      const condition = selectedMachines.some(machine => machine === selectedMachine);
+
+      updateMachineConfig(selectedMachine, newConfig, condition);
       setMachineConfig(newConfig);
       setError(null);
       return true;

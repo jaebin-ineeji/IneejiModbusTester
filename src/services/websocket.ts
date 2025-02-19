@@ -1,26 +1,31 @@
 import { MonitoringRequest, WebSocketResponse } from '@/types/monitoring';
 
+type EventMap = {
+  message: WebSocketResponse;
+  connection: boolean;
+};
+
 type MessageCallback = (data: WebSocketResponse) => void;
 type ConnectionCallback = (isConnected: boolean) => void;
 
 class EventEmitter {
-  private listeners: { [key: string]: Function[] } = {};
+  private listeners: {
+    [K in keyof EventMap]: ((data: EventMap[K]) => void)[];
+  } = {
+    message: [],
+    connection: []
+  };
 
-  on(event: string, callback: Function) {
-    if (!this.listeners[event]) {
-      this.listeners[event] = [];
-    }
+  on<K extends keyof EventMap>(event: K, callback: (data: EventMap[K]) => void) {
     this.listeners[event].push(callback);
   }
 
-  emit(event: string, data: any) {
-    if (!this.listeners[event]) return;
+  emit<K extends keyof EventMap>(event: K, data: EventMap[K]) {
     this.listeners[event].forEach(callback => callback(data));
   }
 
-  off(event: string, callback: Function) {
-    if (!this.listeners[event]) return;
-    this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
+  off<K extends keyof EventMap>(event: K, callback: (data: EventMap[K]) => void) {
+    this.listeners[event] = this.listeners[event].filter(cb => cb !== callback) as typeof this.listeners[K];
   }
 }
 
@@ -28,7 +33,7 @@ class WebSocketService {
   private ws: WebSocket | null = null;
   private eventEmitter = new EventEmitter();
   private reconnectAttempts = 0;
-  private maxReconnectAttempts = 3;
+  private maxReconnectAttempts = 1;
   private reconnectTimeout = 3000;
   private connectionCount = 0;
   private autoReconnect = false;
@@ -45,6 +50,14 @@ class WebSocketService {
   }
 
   private initializeConnection() {
+    if (this.ws?.readyState === WebSocket.CONNECTING) {
+      return;
+    }
+
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      this.ws.close();
+    }
+
     try {
       this.ws = new WebSocket(this.url);
       
@@ -78,6 +91,9 @@ class WebSocketService {
     } catch (error) {
       console.error('WebSocket 연결 에러:', error);
       this.eventEmitter.emit('connection', false);
+      if (this.autoReconnect) {
+        this.attemptReconnect();
+      }
     }
   }
 
@@ -120,6 +136,12 @@ class WebSocketService {
         this.ws = null;
       }
     }
+  }
+
+  reconnect() {
+    this.autoReconnect = true;
+    this.reconnectAttempts = 0;
+    this.initializeConnection();
   }
 
   // 디버깅 및 테스트용

@@ -23,20 +23,30 @@ export const useWebSocketStore = create<WebSocketStore>((set) => ({
   setMonitoringData: (data) => set({ monitoringData: data }),
   setError: (error) => set({ error }),
   connect: () => {
-    webSocketService.connect();
-    webSocketService.onConnectionChange((isConnected) => {
-      set({ isConnected });
-    });
-    webSocketService.subscribe((data) => {
-      set({ monitoringData: data, error: null });
-    });
+    if (!webSocketService.getConnectionCount()) {  // 이미 연결되어 있지 않을 때만
+      webSocketService.connect();
+      
+      // 기존 리스너 제거
+      const connectionCleanup = webSocketService.onConnectionChange((isConnected) => {
+        set({ isConnected });
+      });
+      
+      const messageCleanup = webSocketService.subscribe((data) => {
+        set({ monitoringData: data, error: null });
+      });
+  
+      // cleanup 함수 반환
+      return () => {
+        connectionCleanup();
+        messageCleanup();
+      };
+    }
   },
   disconnect: () => {
     webSocketService.disconnect();
   },
   reconnect: () => {
-    webSocketService.disconnect();
-    webSocketService.connect();
+    webSocketService.reconnect();
   },
   sendMessage: (message) => {
     webSocketService.sendMessage(message);
