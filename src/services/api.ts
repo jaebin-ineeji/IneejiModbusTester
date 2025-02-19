@@ -24,7 +24,7 @@
 //   return mockStatusData;
 // };
 
-import { MachineConfig, TagConfig } from '../types/monitoring';
+import { MachineConfig, TagConfig } from '@/types/monitoring';
 
 const BASE_URL = 'http://localhost:4444';
 

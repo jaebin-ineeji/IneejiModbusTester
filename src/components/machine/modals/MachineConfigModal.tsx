@@ -1,6 +1,6 @@
+import { MachineList } from '@/components/machine/modals/MachineList';
+import { MachineConfig } from '@/types/monitoring';
 import { IoClose } from 'react-icons/io5';
-import { MachineConfig } from '../../../types/monitoring';
-import { MachineList } from './MachineList';
 
 interface MachineConfigModalProps {
   isOpen: boolean;

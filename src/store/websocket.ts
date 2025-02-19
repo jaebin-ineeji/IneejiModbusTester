@@ -1,6 +1,6 @@
+import { webSocketService } from '@/services/websocket';
+import { MonitoringRequest, WebSocketResponse } from '@/types/monitoring';
 import { create } from 'zustand';
-import { webSocketService } from '../services/websocket';
-import { MonitoringRequest, WebSocketResponse } from '../types/monitoring';
 
 interface WebSocketStore {
   isConnected: boolean;

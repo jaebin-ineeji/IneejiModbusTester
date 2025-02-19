@@ -1,6 +1,6 @@
+import { MachineConfig, MachinePosition, MachinePositions, MonitoringRequest } from '@/types/monitoring';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { MachineConfig, MachinePosition, MachinePositions, MonitoringRequest } from '../types/monitoring';
 
 interface MachineStore {
   selectedMachines: string[];
@@ -52,7 +52,7 @@ export const useMachineStore = create<MachineStore>()(
           const  newTagKeys = new Set(Object.keys(config.tags));
           
           // 기존 selectedTags 중에서 새로운 config에 존재하는 태그만 필터링합니다
-          const filteredSelectedTags = state.machineTagsMap[machine].selectedTags?.filter(
+          const filteredSelectedTags = state.machineTagsMap[machine]?.selectedTags?.filter(
             tag => newTagKeys.has(tag)
           );
           return {

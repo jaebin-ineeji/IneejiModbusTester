@@ -1,8 +1,8 @@
+import { MachineConfigModal } from '@/components/machine/modals/MachineConfigModal';
+import { machineApi } from '@/services/api';
+import { useMachineStore } from '@/store/machine';
+import { MonitoringRequest } from '@/types/monitoring';
 import { useEffect, useState } from 'react';
-import { machineApi } from '../services/api';
-import { useMachineStore } from '../store/machine';
-import { MonitoringRequest } from '../types/monitoring';
-import { MachineConfigModal } from './machine/modals/MachineConfigModal';
 
 interface MachineManagerProps {
   onMachinesChange: (request: MonitoringRequest) => void;

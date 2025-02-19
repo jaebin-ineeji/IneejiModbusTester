@@ -1,4 +1,4 @@
-import { MonitoringRequest, WebSocketResponse } from '../types/monitoring';
+import { MonitoringRequest, WebSocketResponse } from '@/types/monitoring';
 
 type MessageCallback = (data: WebSocketResponse) => void;
 type ConnectionCallback = (isConnected: boolean) => void;

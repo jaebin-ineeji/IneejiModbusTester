@@ -1,8 +1,8 @@
+import { MachineConfig } from "@/types/monitoring";
 import { useState } from "react";
 import { ImSpinner } from "react-icons/im";
 import { IoMdSearch } from "react-icons/io";
 import { IoClose, IoSettingsOutline } from "react-icons/io5";
-import { MachineConfig } from "../../../types/monitoring";
 
 interface MachineListProps {
   availableMachines: string[];
