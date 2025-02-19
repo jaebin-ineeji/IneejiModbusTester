@@ -1,0 +1,44 @@
+{
+  "name": "ineeji-modbus-test-app",
+  "version": "1.0.0",
+  "author": "Jaebin Sa",
+  "description": "Ineeji Modbus Test App",
+  "main": "main.js",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build:win": "npm run copy-dist && electron-builder --win",
+    "build:mac": "npm run copy-dist && electron-builder --mac",
+    "build:linux": "npm run copy-dist && electron-builder --linux",
+    "build:all": "npm run copy-dist && electron-builder --win --mac --linux",
+    "copy-dist": "cp -r ../frontend/dist ./dist"
+  },
+  "build": {
+    "appId": "ineeji.modbus.test.app",
+    "productName": "Ineeji Modbus Tester",
+    "files": [
+      "main.js",
+      "dist/**/*"
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": ["nsis", "zip"],
+      "icon": "build/icon/ineeji_logo.png"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "icon": "build/icon/ineeji_logo.icns"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "build/icon/ineeji_logo.png"
+    }
+  }
+}
