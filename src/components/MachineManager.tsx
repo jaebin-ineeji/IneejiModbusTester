@@ -1,6 +1,7 @@
 import { MachineConfigModal } from '@/components/machine/modals/MachineConfigModal';
 import { machineApi } from '@/services/api';
 import { useMachineStore } from '@/store/machine';
+import { useWebSocketStore } from '@/store/websocket';
 import { MonitoringRequest } from '@/types/monitoring';
 import { useEffect, useState } from 'react';
 
@@ -13,7 +14,7 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-
+  const { isConnected } = useWebSocketStore();
   const {
     selectedMachines,
     machineTagsMap,
@@ -40,7 +41,7 @@ export function MachineManager({ onMachinesChange }: MachineManagerProps) {
 
     fetchMachines();
     handleApply();
-  }, []);
+  }, [isConnected]);
 
   const handleToggleMachine = async (machine: string) => {
     const isSelected = selectedMachines.includes(machine);

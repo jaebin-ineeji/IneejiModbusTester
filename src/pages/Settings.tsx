@@ -156,8 +156,8 @@ export function Settings() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-4">
+    <div className="fixed inset-0 flex flex-col bg-gray-100">
+      <div className="flex justify-between items-center p-4 bg-white border-b shadow-sm">
         <h1 className="text-xl font-bold">기계 설정</h1>
         <Link
           to="/"
@@ -167,22 +167,26 @@ export function Settings() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-12 gap-4">
-        <MachineList
-          machines={machines}
-          selectedMachine={selectedMachine}
-          onSelectMachine={setSelectedMachine}
-          onAddMachine={() => setIsAddingMachine(true)}
-        />
+      <div className="flex-1 grid grid-cols-12 gap-4 p-4 min-h-0">
+        <div className="col-span-4 h-full min-h-0">
+          <MachineList
+            machines={machines}
+            selectedMachine={selectedMachine}
+            onSelectMachine={setSelectedMachine}
+            onAddMachine={() => setIsAddingMachine(true)}
+          />
+        </div>
 
-        <MachineConfigComponent
-          selectedMachine={selectedMachine}
-          machineConfig={machineConfig}
-          onDeleteMachine={handleDeleteMachine}
-          onAddTag={() => setIsAddingTag(true)}
-          onEditTag={handleEditTag}
-          onDeleteTag={handleDeleteTag}
-        />
+        <div className="col-span-8 h-full min-h-0">
+          <MachineConfigComponent
+            selectedMachine={selectedMachine}
+            machineConfig={machineConfig}
+            onDeleteMachine={handleDeleteMachine}
+            onAddTag={() => setIsAddingTag(true)}
+            onEditTag={handleEditTag}
+            onDeleteTag={handleDeleteTag}
+          />
+        </div>
       </div>
 
       <AddMachineModal

@@ -28,7 +28,7 @@ class WebSocketService {
   private ws: WebSocket | null = null;
   private eventEmitter = new EventEmitter();
   private reconnectAttempts = 0;
-  private maxReconnectAttempts = 5;
+  private maxReconnectAttempts = 3;
   private reconnectTimeout = 3000;
   private connectionCount = 0;
   private autoReconnect = false;
