@@ -7,6 +7,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
+  base: process.env.ELECTRON_BUILD ? './' : '/',
   css: {
     postcss: {
       plugins: [tailwindcss, autoprefixer],
@@ -25,5 +26,5 @@ export default defineConfig({
         secure: false,
       },
     },
-  },
+  }
 })
