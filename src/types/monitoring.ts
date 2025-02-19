@@ -5,7 +5,10 @@ export interface MachineData {
   MV: number;
   RM: 'LOCAL' | 'REMOTE';
   AM: 'AUTO' | 'MANUAL';
+  [key: string]: number | string;
 }
+
+export type TagValue = string | number;
 
 export interface MonitoringData {
   [key: string]: MachineData;

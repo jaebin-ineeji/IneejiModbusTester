@@ -1,6 +1,6 @@
+import { MachineConfig, MachinePosition, MachinePositions, MonitoringRequest } from '@/types/monitoring';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { MachineConfig, MachinePosition, MachinePositions, MonitoringRequest } from '../types/monitoring';
 
 interface MachineStore {
   selectedMachines: string[];
@@ -9,7 +9,9 @@ interface MachineStore {
   machinePositions: MachinePositions;
   isLayoutMode: boolean;
   setSelectedMachines: (machines: string[]) => void;
-  updateMachineConfig: (machine: string, config: MachineConfig) => void;
+  updateMachineConfig: (machine: string, config: MachineConfig, isSelected?: boolean) => void;
+  deleteMachineTagConfig: (machine: string, config: MachineConfig) => void;
+  deleteMachineConfig: (machine: string) => void;
   updateSelectedTags: (machine: string, tags: string[]) => void;
   removeMachine: (machine: string) => void;
   updateMonitoringRequest: (request: MonitoringRequest) => void;
@@ -29,17 +31,46 @@ export const useMachineStore = create<MachineStore>()(
 
       setSelectedMachines: (machines) => set({ selectedMachines: machines }),
       
-      updateMachineConfig: (machine, config) =>
-        set((state) => ({
-          machineTagsMap: {
-            ...state.machineTagsMap,
-            [machine]: {
-              ...state.machineTagsMap[machine],
-              config,
+      updateMachineConfig: (machine, config, isSelected = false) =>
+        set((state) => {
+          if (!isSelected) {
+            return state;
+          }
+          return {
+            machineTagsMap: {
+              ...state.machineTagsMap,
+              [machine]: {
+                ...state.machineTagsMap[machine],
+                config,
+              },
             },
-          },
-        })),
-      
+          };
+        }),
+      deleteMachineTagConfig: (machine, config) =>
+        set((state) => {
+          // 새로운 config의 태그 키들을 Set으로 만듭니다
+          const  newTagKeys = new Set(Object.keys(config.tags));
+          
+          // 기존 selectedTags 중에서 새로운 config에 존재하는 태그만 필터링합니다
+          const filteredSelectedTags = state.machineTagsMap[machine]?.selectedTags?.filter(
+            tag => newTagKeys.has(tag)
+          );
+          return {
+            machineTagsMap: {
+              ...state.machineTagsMap,
+              [machine]: {
+              config,
+                selectedTags: filteredSelectedTags,
+              },
+            },
+          };
+        }),
+      deleteMachineConfig: (machine) =>
+        set((state) => {
+          const { [machine]: _, ...rest } = state.machineTagsMap;
+          return { machineTagsMap: rest };
+        }),
+
       updateSelectedTags: (machine, tags) =>
         set((state) => ({
           machineTagsMap: {
@@ -55,9 +86,11 @@ export const useMachineStore = create<MachineStore>()(
         set((state) => {
           const { [machine]: _, ...rest } = state.machineTagsMap;
           const { [machine]: __, ...restPositions } = state.machinePositions;
+          const { [machine]: ___, ...restMonitoringRequest } = state.monitoringRequest;
           return {
             machineTagsMap: rest,
             machinePositions: restPositions,
+            monitoringRequest: restMonitoringRequest,
             selectedMachines: state.selectedMachines.filter((m: string) => m !== machine),
           };
         }),
