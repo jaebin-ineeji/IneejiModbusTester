@@ -62,7 +62,8 @@ function checkForUpdates() {
         owner: 'jaebin-ineeji',
         repo: 'IneejiModbusTester',
         private: true,
-        token: process.env.GH_TOKEN  // 환경변수에서 토큰 가져오기
+        token: process.env.GH_TOKEN,  // 환경변수에서 토큰 가져오기
+        releaseType: 'release'  // 추가
     });
     
     autoUpdater.autoDownload = true; // 자동 다운로드 활성화

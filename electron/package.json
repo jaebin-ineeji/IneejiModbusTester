@@ -17,6 +17,10 @@
     "build:all": "npm run copy-dist && electron-builder --win --mac --linux --publish always",
     "copy-dist": "cp -r ../frontend/dist ./dist"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaebin-ineeji/IneejiModbusTester.git"
+  },
   "build": {
     "publish": [
       {
