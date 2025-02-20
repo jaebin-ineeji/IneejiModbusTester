@@ -81,4 +81,10 @@ export const machineApi = {
   async deleteMachineTag(machineName: string, tagName: string): Promise<void> {
     return api.delete(`/machine/${machineName}/tags/${tagName}`);
   },
+
+  async setTagValue(machineName: string, tagName: string, value: string | undefined): Promise<boolean> {
+    const params = new URLSearchParams({ tag_value: value?.toString() || '' });
+    await api.post(`/machine/${machineName}/tags/${tagName}?${params.toString()}`);
+    return true;
+  }
 }; 

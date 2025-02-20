@@ -1,7 +1,9 @@
 import { TagValue } from '@/components/monitoring/TagValue';
+import { ControlModal } from '@/components/monitoring/modals/ControlModal';
 import { useMachineStore } from '@/store/machine';
 import { MachineData } from '@/types/monitoring';
 import { getBackgroundColor } from '@/utils/machineUtils';
+import { useState } from 'react';
 import { ImSpinner } from "react-icons/im";
 
 interface MonitoringBoxProps {
@@ -10,13 +12,23 @@ interface MonitoringBoxProps {
   isConnected: boolean;
 }
 
-
 export const MonitoringBox = ({ machineName, machineData, isConnected }: MonitoringBoxProps) => {
   const { machineTagsMap } = useMachineStore();
+  const [isControlModalOpen, setIsControlModalOpen] = useState(false);
   const selectedTags = machineTagsMap[machineName]?.selectedTags || [];
 
+  const handleBoxClick = () => {
+    if (isConnected) {
+      setIsControlModalOpen(true);
+    }
+  };
+
   return (
-    <div className="border-2 border-black p-2 rounded-lg bg-gray-50 shadow-md">
+    <>
+      <div 
+        className="border-2 border-black p-2 rounded-lg bg-gray-50 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+        onClick={handleBoxClick}
+      >
       <div className={`${getBackgroundColor(machineName)} text-white px-2 py-1 text-lg flex justify-between items-center`}>
         <span>{machineName}</span>
         {isConnected ? (
@@ -35,5 +47,13 @@ export const MonitoringBox = ({ machineName, machineData, isConnected }: Monitor
         )}
       </div>
     </div>
+
+      <ControlModal
+        isOpen={isControlModalOpen}
+        onClose={() => setIsControlModalOpen(false)}
+        machineName={machineName}
+        machineData={machineData}
+      />
+    </>
   );
 }; 
