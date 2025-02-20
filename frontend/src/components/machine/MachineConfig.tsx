@@ -3,7 +3,6 @@ import { MachineConfig as IMachineConfig, TagConfig } from '@/types/monitoring';
 interface MachineConfigProps {
   selectedMachine: string;
   machineConfig: IMachineConfig | null;
-  onDeleteMachine: () => void;
   onAddTag: () => void;
   onEditTag: (tagName: string, tagConfig: TagConfig) => void;
   onDeleteTag: (tagName: string) => void;
@@ -12,7 +11,6 @@ interface MachineConfigProps {
 export function MachineConfig({
   selectedMachine,
   machineConfig,
-  onDeleteMachine,
   onAddTag,
   onEditTag,
   onDeleteTag,
@@ -29,67 +27,67 @@ export function MachineConfig({
     <div className="h-full flex flex-col bg-white p-4 rounded-lg shadow">
       <div className="shrink-0 flex justify-between items-center mb-4">
         <h2 className="text-lg font-medium">{selectedMachine} 설정</h2>
-        <div className="space-x-2">
-          <button
-            onClick={onAddTag}
-            className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-          >
-            태그 추가
-          </button>
-          <button
-            onClick={onDeleteMachine}
-            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            기계 삭제
-          </button>
-        </div>
+        <button
+          onClick={onAddTag}
+          className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          태그 추가
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0">
         <div className="space-y-4">
           {machineConfig && (
-            <div className="p-4 bg-gray-50 rounded">
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
               <h3 className="font-medium mb-2">기본 정보</h3>
               <div className="grid grid-cols-3 gap-4">
-                <div>
+                <div className="p-2 bg-white rounded border border-gray-100">
                   <span className="text-gray-600">IP:</span> {machineConfig.ip}
                 </div>
-                <div>
+                <div className="p-2 bg-white rounded border border-gray-100">
                   <span className="text-gray-600">Port:</span> {machineConfig.port}
                 </div>
-                <div>
+                <div className="p-2 bg-white rounded border border-gray-100">
                   <span className="text-gray-600">Slave:</span> {machineConfig.slave}
                 </div>
               </div>
             </div>
           )}
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <h3 className="font-medium">태그 목록</h3>
-            <div className="space-y-2">
+            <div className="grid gap-3">
               {machineConfig &&
                 Object.entries(machineConfig.tags).map(([tagName, tagConfig]) => (
                   <div
                     key={tagName}
-                    className="flex justify-between items-center p-2 bg-gray-50 rounded"
+                    className="flex justify-between items-center p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-200 transition-colors"
                   >
-                    <div>
-                      <span className="font-medium">{tagName}</span>
-                      <div className="text-sm text-gray-600">
-                        {tagConfig.tag_type} | {tagConfig.logical_register} |{' '}
-                        {tagConfig.real_register} | {tagConfig.permission}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-blue-600">{tagName}</span>
+                        <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full">
+                          {tagConfig.tag_type}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-500 space-x-2">
+                        <span>논리 레지스터: {tagConfig.logical_register}</span>
+                        <span>•</span>
+                        <span>실제 레지스터: {tagConfig.real_register}</span>
+                        <span>•</span>
+                        <span>권한: {tagConfig.permission}</span>
                       </div>
                     </div>
-                    <div className="space-x-2">
+                    <div className="flex gap-2">
                       <button
                         onClick={() => onEditTag(tagName, tagConfig)}
-                        className="px-2 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                        className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         수정
                       </button>
                       <button
                         onClick={() => onDeleteTag(tagName)}
-                        className="px-2 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                        className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         삭제
                       </button>

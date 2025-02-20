@@ -174,6 +174,7 @@ export function Settings() {
             selectedMachine={selectedMachine}
             onSelectMachine={setSelectedMachine}
             onAddMachine={() => setIsAddingMachine(true)}
+            onDeleteMachine={handleDeleteMachine}
           />
         </div>
 
@@ -181,7 +182,6 @@ export function Settings() {
           <MachineConfigComponent
             selectedMachine={selectedMachine}
             machineConfig={machineConfig}
-            onDeleteMachine={handleDeleteMachine}
             onAddTag={() => setIsAddingTag(true)}
             onEditTag={handleEditTag}
             onDeleteTag={handleDeleteTag}

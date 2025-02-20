@@ -3,6 +3,7 @@ interface MachineListProps {
   selectedMachine: string;
   onSelectMachine: (machine: string) => void;
   onAddMachine: () => void;
+  onDeleteMachine: () => void;
 }
 
 export function MachineList({
@@ -10,6 +11,7 @@ export function MachineList({
   selectedMachine,
   onSelectMachine,
   onAddMachine,
+  onDeleteMachine,
 }: MachineListProps) {
   return (
     <div className="h-full flex flex-col bg-white p-4 rounded-lg shadow">
@@ -27,14 +29,26 @@ export function MachineList({
           {machines.map(machine => (
             <div
               key={machine}
-              className={`p-2 rounded cursor-pointer ${
+              className={`p-3 rounded-lg border flex items-center justify-between ${
                 selectedMachine === machine
-                  ? 'bg-blue-100 text-blue-800'
-                  : 'hover:bg-gray-100'
+                  ? 'bg-blue-50 border-blue-200'
+                  : 'border-gray-200 hover:bg-gray-50'
               }`}
-              onClick={() => onSelectMachine(machine)}
             >
-              {machine}
+              <div
+                className="flex-1 cursor-pointer"
+                onClick={() => onSelectMachine(machine)}
+              >
+                {machine}
+              </div>
+              {selectedMachine === machine && (
+                <button
+                  onClick={onDeleteMachine}
+                  className="ml-2 px-2 py-1 text-sm text-red-600 hover:bg-red-50 rounded"
+                >
+                  삭제
+                </button>
+              )}
             </div>
           ))}
         </div>
