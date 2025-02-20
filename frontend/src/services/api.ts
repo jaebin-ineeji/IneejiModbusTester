@@ -1,138 +1,84 @@
-// import { mockOilData, mockOxygenData } from '../mocks/monitoringData';
-// // import { OilData, OxygenData } from '../types/monitoring';
-
-// // Mock API delay
-// const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-// export const fetchOilData = async (): Promise<OilData[]> => {
-//   await delay(500); // 실제 API 호출처럼 보이도록 지연 추가
-//   return mockOilData;
-// };
-
-// export const fetchOxygenData = async (): Promise<OxygenData[]> => {
-//   await delay(500);
-//   return mockOxygenData;
-// };
-
-// export const fetchTemperatureData = async (): Promise<TemperatureData[]> => {
-//   await delay(500);
-//   return mockTemperatureData;
-// };
-
-// export const fetchStatusData = async (): Promise<StatusData[]> => {
-//   await delay(500);
-//   return mockStatusData;
-// };
-
 import { MachineConfig, TagConfig } from '@/types/monitoring';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
-const BASE_URL = 'http://localhost:4444';
 
-interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
-}
+// axios 인스턴스 생성
+const createAxiosInstance = (): AxiosInstance => {
+  const instance = axios.create({
+    baseURL: 'http://localhost:4444',
+    timeout: 5000,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  // 응답 인터셉터
+  instance.interceptors.response.use(
+    (response: AxiosResponse) => {
+      if (!response.data.success) {
+        throw new Error(response.data.message);
+      }
+      return response.data.data;
+    },
+    (error) => {
+      const message = error.response?.data?.message || error.message || '알 수 없는 오류가 발생했습니다.';
+      throw new Error(message);
+    }
+  );
+
+  return instance;
+};
+
+const api = createAxiosInstance();
 
 export const machineApi = {
   // 기계 목록 조회
   async getMachineList(): Promise<string[]> {
-    const response = await fetch(`${BASE_URL}/machine`);
-    const data: ApiResponse<string[]> = await response.json();
-    if (!data.success) {
-      throw new Error(data.message);
-    }
-    return data.data;
+    return api.get('/machine');
   },
 
   // 기계 설정 조회
   async getMachineConfig(machineName: string): Promise<MachineConfig> {
-    const response = await fetch(`${BASE_URL}/machine/${machineName}`);
-    const data: ApiResponse<MachineConfig> = await response.json();
-    if (!data.success) {
-      throw new Error(data.message);
-    }
-    return data.data;
+    return api.get(`/machine/${machineName}`);
   },
 
   // 기계 추가
   async addMachine(machineName: string, config: MachineConfig): Promise<void> {
-    const response = await fetch(`${BASE_URL}/machine/${machineName}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(config),
-    });
-    const data: ApiResponse<void> = await response.json();
-    if (!data.success) {
-      throw new Error(data.message);
-    }
+    return api.post(`/machine/${machineName}`, config);
   },
 
+  // 기계 삭제
   async deleteMachine(machineName: string): Promise<void> {
-    const response = await fetch(`${BASE_URL}/machine/${machineName}`, {
-      method: 'DELETE',
-    });
-    const data: ApiResponse<void> = await response.json();
-    if (!data.success) {
-      throw new Error(data.message);
-    }
+    return api.delete(`/machine/${machineName}`);
   },
 
+  // 기계 태그 추가
   async addMachineTag(
     machineName: string,
     tagName: string,
     config: TagConfig
   ): Promise<void> {
     const params = new URLSearchParams({ tag_name: tagName });
-    const response = await fetch(
-      `${BASE_URL}/machine/${machineName}/tags?${params.toString()}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(config),
-      }
+    return api.post(
+      `/machine/${machineName}/tags?${params.toString()}`,
+      config
     );
-    const data: ApiResponse<void> = await response.json();
-    if (!data.success) {
-      throw new Error(data.message);
-    }
   },
 
+  // 기계 태그 수정
   async updateMachineTag(
     machineName: string,
     tagName: string,
     config: TagConfig
   ): Promise<void> {
-    const response = await fetch(
-      `${BASE_URL}/machine/${machineName}/tags/${tagName}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(config),
-      }
+    return api.put(
+      `/machine/${machineName}/tags/${tagName}`,
+      config
     );
-    const data: ApiResponse<void> = await response.json();
-    if (!data.success) {
-      throw new Error(data.message);
-    }
   },
 
+  // 기계 태그 삭제
   async deleteMachineTag(machineName: string, tagName: string): Promise<void> {
-    const response = await fetch(
-      `${BASE_URL}/machine/${machineName}/tags/${tagName}`,
-      {
-        method: 'DELETE',
-      }
-    );
-    const data: ApiResponse<void> = await response.json();
-    if (!data.success) {
-      throw new Error(data.message);
-    }
+    return api.delete(`/machine/${machineName}/tags/${tagName}`);
   },
 }; 
