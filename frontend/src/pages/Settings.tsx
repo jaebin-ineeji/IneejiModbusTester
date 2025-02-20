@@ -161,13 +161,13 @@ export function Settings() {
         <h1 className="text-xl font-bold">기계 설정</h1>
         <Link
           to="/"
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
         >
           모니터링으로 돌아가기
         </Link>
       </div>
 
-      <div className="flex-1 grid grid-cols-12 gap-4 p-4 min-h-0">
+      <div className="flex-1 grid grid-cols-12 gap-6 p-6 min-h-0 bg-gray-50">
         <div className="col-span-4 h-full min-h-0">
           <MachineList
             machines={machines}

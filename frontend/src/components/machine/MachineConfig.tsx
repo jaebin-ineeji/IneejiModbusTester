@@ -29,7 +29,7 @@ export function MachineConfig({
         <h2 className="text-lg font-medium">{selectedMachine} 설정</h2>
         <button
           onClick={onAddTag}
-          className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+          className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
         >
           태그 추가
         </button>
@@ -38,30 +38,35 @@ export function MachineConfig({
       <div className="flex-1 overflow-y-auto min-h-0">
         <div className="space-y-4">
           {machineConfig && (
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h3 className="font-medium mb-2">기본 정보</h3>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="p-2 bg-white rounded border border-gray-100">
-                  <span className="text-gray-600">IP:</span> {machineConfig.ip}
-                </div>
-                <div className="p-2 bg-white rounded border border-gray-100">
-                  <span className="text-gray-600">Port:</span> {machineConfig.port}
-                </div>
-                <div className="p-2 bg-white rounded border border-gray-100">
-                  <span className="text-gray-600">Slave:</span> {machineConfig.slave}
+            <div className="sticky top-0 z-0 bg-white pb-4">
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 className="font-medium mb-2">{selectedMachine} 기본 정보</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <span className="text-gray-600 block text-sm mb-1">IP 주소</span>
+                    <span className="font-medium">{machineConfig.ip}</span>
+                  </div>
+                  <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <span className="text-gray-600 block text-sm mb-1">포트</span>
+                    <span className="font-medium">{machineConfig.port}</span>
+                  </div>
+                  <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <span className="text-gray-600 block text-sm mb-1">슬레이브</span>
+                    <span className="font-medium">{machineConfig.slave}</span>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           <div className="space-y-3">
-            <h3 className="font-medium">태그 목록</h3>
+            <h3 className="font-medium text-lg">태그 목록</h3>
             <div className="grid gap-3">
               {machineConfig &&
                 Object.entries(machineConfig.tags).map(([tagName, tagConfig]) => (
                   <div
                     key={tagName}
-                    className="flex justify-between items-center p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-200 transition-colors"
+                    className="flex justify-between items-center p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-200 transition-colors shadow-sm"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
