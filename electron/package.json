@@ -11,10 +11,10 @@
   "type": "commonjs",
   "scripts": {
     "start": "electron .",
-    "build:win": "npm run copy-dist && electron-builder --win --publish always",
+    "build:win": "node scripts/build.js --win",
     "build:mac": "node scripts/build.js --mac",
-    "build:linux": "npm run copy-dist && electron-builder --linux --publish always",
-    "build:all": "npm run copy-dist && electron-builder --win --mac --linux --publish always",
+    "build:linux": "node scripts/build.js --linux",
+    "build:all": "node scripts/build.js --all",
     "copy-dist": "cp -r ../frontend/dist ./dist"
   },
   "repository": {

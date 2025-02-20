@@ -53,12 +53,11 @@ function createWindow() {
 /** ✅ 업데이트 감지 및 알람 표시 기능 */
 function checkForUpdates() {
     // 개발 환경에서는 업데이트 체크 건너뛰기
-    if (!app.isPackaged) {
+    if (!app.isPackaged || process.platform === 'darwin') {
         console.log('개발 환경에서는 업데이트를 체크하지 않습니다.');
         return;
     }
     
-    autoUpdater.autoDownload = true; // 자동 다운로드 활성화
     autoUpdater.checkForUpdatesAndNotify(); // 업데이트 확인 및 알림
 
     // 다운로드 진행상황 표시
@@ -67,12 +66,17 @@ function checkForUpdates() {
     });
 
     // 업데이트를 찾았을 때
-    autoUpdater.on('update-available', () => {
+    autoUpdater.on('update-available', (info) => {
         dialog.showMessageBox({
             type: 'info',
             title: '업데이트 가능',
-            message: '새 버전이 있습니다. 다운로드를 시작합니다.',
-            buttons: ['업데이트', '나중에']
+            message: `새 버전(${info.version})이 있습니다. 다운로드를 시작할까요?`,
+            buttons: ['업데이트', '나중에'],
+            defaultId: 0
+        }).then(result => {
+            if (result.response === 0) {
+                autoUpdater.downloadUpdate();
+            }
         });
     });
 
