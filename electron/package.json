@@ -15,7 +15,8 @@
     "build:mac": "node scripts/build.js --mac",
     "build:linux": "node scripts/build.js --linux",
     "build:all": "node scripts/build.js --all",
-    "copy-dist": "cp -r ../frontend/dist ./dist"
+    "copy-dist": "cp -r ../frontend/dist ./dist",
+    "build:front": "cd ../frontend && npm run build:electron"
   },
   "repository": {
     "type": "git",
