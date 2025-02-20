@@ -1,5 +1,6 @@
 import { TagValue } from '@/components/monitoring/TagValue';
 import { useMachineStore } from '@/store/machine';
+import { useModalStore } from '@/store/modal';
 import { MachineData } from '@/types/monitoring';
 import { getBackgroundColor } from '@/utils/machineUtils';
 import { ImSpinner } from "react-icons/im";
@@ -10,13 +11,26 @@ interface MonitoringBoxProps {
   isConnected: boolean;
 }
 
-
 export const MonitoringBox = ({ machineName, machineData, isConnected }: MonitoringBoxProps) => {
-  const { machineTagsMap } = useMachineStore();
+  const { machineTagsMap, isLayoutMode } = useMachineStore();
+  const { openControlModal, selectedMachine } = useModalStore();
   const selectedTags = machineTagsMap[machineName]?.selectedTags || [];
 
+  const handleBoxClick = () => {
+    if (isConnected && !isLayoutMode) {
+      openControlModal(machineName, machineData);
+    }
+  };
+
+  const isSelected = selectedMachine === machineName;
+
   return (
-    <div className="border-2 border-black p-2 rounded-lg bg-gray-50 shadow-md">
+    <div 
+      className={`relative border-2 border-black p-2 rounded-lg bg-gray-50 shadow-md cursor-pointer hover:shadow-lg transition-all duration-500 ${
+        selectedMachine ? (isSelected ? 'z-[99] opacity-100 border-4 scale-105 border-black' : 'opacity-30') : 'opacity-100'
+      } ${isLayoutMode ? 'cursor-move' : ''}`}
+      onClick={handleBoxClick}
+    >
       <div className={`${getBackgroundColor(machineName)} text-white px-2 py-1 text-lg flex justify-between items-center`}>
         <span>{machineName}</span>
         {isConnected ? (

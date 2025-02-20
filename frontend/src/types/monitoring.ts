@@ -41,9 +41,7 @@ export interface MachineConfig {
   ip: string;
   port: number;
   slave: number;
-  tags: {
-    [key: string]: TagConfig;
-  };
+  tags: Record<string, TagConfig>;
 }
 
 export interface WebSocketResponse {

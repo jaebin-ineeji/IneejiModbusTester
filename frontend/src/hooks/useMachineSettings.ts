@@ -10,6 +10,15 @@ interface MachineFormData {
   slave: number;
 }
 
+interface MachineConfigImport {
+  [key: string]: {
+    ip: string;
+    port: number;
+    slave: number;
+    tags: Record<string, TagConfig>;
+  };
+}
+
 export function useMachineSettings() {
   const [machines, setMachines] = useState<string[]>([]);
   const [selectedMachine, setSelectedMachine] = useState<string>('');
@@ -134,6 +143,19 @@ export function useMachineSettings() {
     }
   }, [selectedMachine, deleteMachineTagConfig]);
 
+  const importMachineConfig = useCallback(async (config: MachineConfigImport) => {
+    try {
+      await machineApi.importConfig(config);
+      await fetchMachines();
+      setError(null);
+      return true;
+    } catch (err) {
+      console.error(err);
+      setError('기계 설정 가져오기에 실패했습니다.');
+      return false;
+    }
+  }, [fetchMachines]);
+
   return {
     machines,
     selectedMachine,
@@ -147,5 +169,6 @@ export function useMachineSettings() {
     addTag,
     updateTag,
     deleteTag,
+    importMachineConfig,
   };
 } 

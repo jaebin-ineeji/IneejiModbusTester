@@ -100,7 +100,7 @@ export const MonitoringGrid = ({ data, isConnected, isLayoutMode }: MonitoringGr
   return (
     <div
       ref={gridRef}
-      className={`relative w-full h-[calc(100vh-150px)] rounded-lg p-4 border-4 border-gray-300 overflow-y-auto ${
+      className={`relative w-full h-[calc(100vh-150px)] rounded-lg p-4 border-4 border-gray-300 overflow-y-auto z-0 ${
         isLayoutMode ? 'bg-gray-300 border-2 border-dashed border-gray-500' : 'bg-gray-50'
       }`}
       onDragOver={handleDragOver}

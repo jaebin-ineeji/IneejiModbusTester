@@ -3,10 +3,12 @@ import { MachineConfig as MachineConfigComponent } from '@/components/machine/Ma
 import { MachineList } from '@/components/machine/MachineList';
 import { AddMachineModal } from '@/components/machine/modals/AddMachineModal';
 import { TagModal } from '@/components/machine/modals/TagModal';
+import { useApiOperation } from '@/hooks/useApiOperation';
 import { useMachineSettings } from '@/hooks/useMachineSettings';
+import { useModal } from '@/hooks/useModal';
 import { useToast } from '@/hooks/useToast';
-import { Permission, TagConfig, TagType } from '@/types/monitoring';
-import { useEffect, useState } from 'react';
+import { Permission, TagType } from '@/types/monitoring';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 interface MachineFormData {
@@ -38,26 +40,14 @@ export function Settings() {
     addTag,
     updateTag,
     deleteTag,
+    importMachineConfig,
   } = useMachineSettings();
 
   const { showToast } = useToast();
+  const { modalState, openModal, closeModal } = useModal();
+  const { handleOperation } = useApiOperation();
 
-  const [isAddingMachine, setIsAddingMachine] = useState(false);
-  const [isAddingTag, setIsAddingTag] = useState(false);
-  const [isEditingTag, setIsEditingTag] = useState(false);
-  const [selectedTag, setSelectedTag] = useState<string>('');
-  const [editingTagConfig, setEditingTagConfig] = useState<TagConfig | null>(null);
-  const [confirmModal, setConfirmModal] = useState<{
-    isOpen: boolean;
-    title: string;
-    message: string;
-    onConfirm: () => void;
-  }>({
-    isOpen: false,
-    title: '',
-    message: '',
-    onConfirm: () => {},
-  });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchMachines();
@@ -73,86 +63,110 @@ export function Settings() {
     if (error) {
       showToast(error, 'error');
     }
-  }, [error]);
+  }, [error, showToast]);
 
-  const handleAddMachine = async (formData: MachineFormData) => {
-    const success = await addMachine(formData);
-    if (success) {
-      setIsAddingMachine(false);
-      showToast('기계가 추가되었습니다.', 'success');
-    }
+  const handleAddMachine = (formData: MachineFormData) => {
+    handleOperation(
+      () => addMachine(formData),
+      '기계가 추가되었습니다.',
+      () => closeModal('addMachine')
+    );
   };
 
-  const handleAddTag = async (formData: TagFormData) => {
-    const success = await addTag(formData.name, {
-      tag_type: formData.tag_type,
-      logical_register: formData.logical_register,
-      real_register: formData.real_register,
-      permission: formData.permission,
-    });
-    if (success) {
-      setIsAddingTag(false);
-      showToast('태그가 추가되었습니다.', 'success');
-    }
-  };
-
-  const handleUpdateTag = async (formData: TagFormData) => {
-    setConfirmModal({
-      isOpen: true,
-      title: '태그 수정',
-      message: '정말로 이 태그를 수정하시겠습니까?',
-      onConfirm: async () => {
-        const success = await updateTag(selectedTag, {
+  const handleAddTag = (formData: TagFormData) => {
+    handleOperation(
+      () =>
+        addTag(formData.name, {
           tag_type: formData.tag_type,
           logical_register: formData.logical_register,
           real_register: formData.real_register,
           permission: formData.permission,
-        });
-        if (success) {
-          setIsEditingTag(false);
-          setSelectedTag('');
-          setEditingTagConfig(null);
-          showToast('태그가 수정되었습니다.', 'success');
-        }
-        setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }),
+      '태그가 추가되었습니다.',
+      () => closeModal('tagModal')
+    );
+  };
+
+  const handleUpdateTag = (formData: TagFormData) => {
+    openModal('confirm', {
+      title: '태그 수정',
+      message: '정말로 이 태그를 수정하시겠습니까?',
+      onConfirm: () => {
+        handleOperation(
+          () =>
+            updateTag(modalState.tagModal.selectedTag, {
+              tag_type: formData.tag_type,
+              logical_register: formData.logical_register,
+              real_register: formData.real_register,
+              permission: formData.permission,
+            }),
+          '태그가 수정되었습니다.',
+          () => {
+            closeModal('tagModal');
+            closeModal('confirm');
+          }
+        );
       },
     });
   };
 
   const handleDeleteTag = (tagName: string) => {
-    setConfirmModal({
-      isOpen: true,
+    openModal('confirm', {
       title: '태그 삭제',
       message: '정말로 이 태그를 삭제하시겠습니까?',
-      onConfirm: async () => {
-        const success = await deleteTag(tagName);
-        if (success) {
-          showToast('태그가 삭제되었습니다.', 'success');
-        }
-        setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+      onConfirm: () => {
+        handleOperation(
+          () => deleteTag(tagName),
+          '태그가 삭제되었습니다.',
+          () => closeModal('confirm')
+        );
       },
     });
-  };
-
-  const handleEditTag = (tagName: string, tagConfig: TagConfig) => {
-    setSelectedTag(tagName);
-    setEditingTagConfig(tagConfig);
-    setIsEditingTag(true);
   };
 
   const handleDeleteMachine = () => {
-    setConfirmModal({
-      isOpen: true,
+    openModal('confirm', {
       title: '기계 삭제',
       message: '정말로 이 기계를 삭제하시겠습니까? 모든 태그 정보가 함께 삭제됩니다.',
-      onConfirm: async () => {
-        const success = await deleteMachine();
-        if (success) {
-          showToast('기계가 삭제되었습니다.', 'success');
-        }
-        setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+      onConfirm: () => {
+        handleOperation(
+          () => deleteMachine(),
+          '기계가 삭제되었습니다.',
+          () => closeModal('confirm')
+        );
       },
     });
+  };
+
+  const handleImportConfig = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const text = e.target?.result;
+        if (typeof text === 'string') {
+          try {
+            const config = JSON.parse(text);
+            handleOperation(
+              () => importMachineConfig(config),
+              '기계 설정이 성공적으로 가져와졌습니다.',
+              () => {
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = '';
+                }
+              }
+            );
+          } catch {
+            showToast('잘못된 JSON 형식입니다.', 'error');
+          }
+        }
+      };
+      reader.readAsText(file);
+    } catch {
+      showToast('파일을 읽는데 실패했습니다.', 'error');
+    }
   };
 
   return (
@@ -161,19 +175,28 @@ export function Settings() {
         <h1 className="text-xl font-bold">기계 설정</h1>
         <Link
           to="/"
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
         >
           모니터링으로 돌아가기
         </Link>
       </div>
 
-      <div className="flex-1 grid grid-cols-12 gap-4 p-4 min-h-0">
+      <div className="flex-1 grid grid-cols-12 gap-6 p-6 min-h-0 bg-gray-50">
         <div className="col-span-4 h-full min-h-0">
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".json"
+            onChange={handleImportConfig}
+            className="hidden"
+          />
           <MachineList
             machines={machines}
             selectedMachine={selectedMachine}
             onSelectMachine={setSelectedMachine}
-            onAddMachine={() => setIsAddingMachine(true)}
+            onAddMachine={() => openModal('addMachine')}
+            onDeleteMachine={handleDeleteMachine}
+            onImportConfig={() => fileInputRef.current?.click()}
           />
         </div>
 
@@ -181,46 +204,42 @@ export function Settings() {
           <MachineConfigComponent
             selectedMachine={selectedMachine}
             machineConfig={machineConfig}
-            onDeleteMachine={handleDeleteMachine}
-            onAddTag={() => setIsAddingTag(true)}
-            onEditTag={handleEditTag}
+            onAddTag={() => openModal('tagModal')}
+            onEditTag={(tagName, tagConfig) =>
+              openModal('tagModal', { selectedTag: tagName, editingTagConfig: tagConfig })
+            }
             onDeleteTag={handleDeleteTag}
           />
         </div>
       </div>
 
       <AddMachineModal
-        isOpen={isAddingMachine}
-        onClose={() => setIsAddingMachine(false)}
+        isOpen={modalState.addMachine.isOpen}
+        onClose={() => closeModal('addMachine')}
         onAdd={handleAddMachine}
       />
 
       <TagModal
-        isOpen={isAddingTag || isEditingTag}
-        onClose={() => {
-          setIsAddingTag(false);
-          setIsEditingTag(false);
-          setSelectedTag('');
-          setEditingTagConfig(null);
-        }}
-        onSubmit={isEditingTag ? handleUpdateTag : handleAddTag}
-        editMode={isEditingTag}
+        isOpen={modalState.tagModal.isOpen}
+        onClose={() => closeModal('tagModal')}
+        onSubmit={modalState.tagModal.editingTagConfig ? handleUpdateTag : handleAddTag}
+        editMode={!!modalState.tagModal.editingTagConfig}
         initialData={
-          editingTagConfig
+          modalState.tagModal.editingTagConfig
             ? {
-                name: selectedTag,
-                ...editingTagConfig,
+                name: modalState.tagModal.selectedTag,
+                ...modalState.tagModal.editingTagConfig,
               }
             : undefined
         }
       />
 
       <ConfirmModal
-        isOpen={confirmModal.isOpen}
-        title={confirmModal.title}
-        message={confirmModal.message}
-        onConfirm={confirmModal.onConfirm}
-        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+        isOpen={modalState.confirm.isOpen}
+        title={modalState.confirm.title}
+        message={modalState.confirm.message}
+        onConfirm={modalState.confirm.onConfirm}
+        onCancel={() => closeModal('confirm')}
       />
     </div>
   );
