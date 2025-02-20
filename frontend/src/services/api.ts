@@ -86,5 +86,15 @@ export const machineApi = {
     const params = new URLSearchParams({ tag_value: value?.toString() || '' });
     await api.post(`/machine/${machineName}/tags/${tagName}?${params.toString()}`);
     return true;
+  },
+
+  // 설정 일괄 가져오기
+  async importConfig(config: Record<string, MachineConfig>): Promise<void> {
+    return api.post('/config/import', config);
+  },
+
+  // 설정 일괄 내보내기
+  async exportConfig(): Promise<Record<string, MachineConfig>> {
+    return api.get('/config/export');
   }
 }; 

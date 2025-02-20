@@ -1,3 +1,4 @@
+import DongwonLogo from '@/assets/dongwon_logo.jpg';
 import { MachineManager } from '@/components/MachineManager';
 import { MonitoringGrid } from '@/components/monitoring/MonitoringGrid';
 import { ControlModal } from '@/components/monitoring/modals/ControlModal';
@@ -130,7 +131,8 @@ export function MonitoringPage() {
   return (
     <div className="flex-1 flex flex-col">
       <div className="flex justify-between items-center p-4">
-        <h1 className="text-xl font-bold">동원시스템즈 유리 용해로 제어 테스트</h1>
+        <img src={DongwonLogo} alt="동원시스템즈 로고" className="h-10" />
+        <h1 className="text-2xl font-bold tracking-tight font-spoqa">동원시스템즈 유리 용해로 제어 테스트</h1>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <div className={`px-3 py-1 rounded ${isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>

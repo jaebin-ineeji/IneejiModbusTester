@@ -8,7 +8,7 @@ import { useMachineSettings } from '@/hooks/useMachineSettings';
 import { useModal } from '@/hooks/useModal';
 import { useToast } from '@/hooks/useToast';
 import { Permission, TagType } from '@/types/monitoring';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 interface MachineFormData {
@@ -40,11 +40,14 @@ export function Settings() {
     addTag,
     updateTag,
     deleteTag,
+    importMachineConfig,
   } = useMachineSettings();
 
   const { showToast } = useToast();
   const { modalState, openModal, closeModal } = useModal();
   const { handleOperation } = useApiOperation();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchMachines();
@@ -135,6 +138,37 @@ export function Settings() {
     });
   };
 
+  const handleImportConfig = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const text = e.target?.result;
+        if (typeof text === 'string') {
+          try {
+            const config = JSON.parse(text);
+            handleOperation(
+              () => importMachineConfig(config),
+              '기계 설정이 성공적으로 가져와졌습니다.',
+              () => {
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = '';
+                }
+              }
+            );
+          } catch {
+            showToast('잘못된 JSON 형식입니다.', 'error');
+          }
+        }
+      };
+      reader.readAsText(file);
+    } catch {
+      showToast('파일을 읽는데 실패했습니다.', 'error');
+    }
+  };
+
   return (
     <div className="fixed inset-0 flex flex-col bg-gray-100">
       <div className="flex justify-between items-center p-4 bg-white border-b shadow-sm">
@@ -149,12 +183,20 @@ export function Settings() {
 
       <div className="flex-1 grid grid-cols-12 gap-6 p-6 min-h-0 bg-gray-50">
         <div className="col-span-4 h-full min-h-0">
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".json"
+            onChange={handleImportConfig}
+            className="hidden"
+          />
           <MachineList
             machines={machines}
             selectedMachine={selectedMachine}
             onSelectMachine={setSelectedMachine}
             onAddMachine={() => openModal('addMachine')}
             onDeleteMachine={handleDeleteMachine}
+            onImportConfig={() => fileInputRef.current?.click()}
           />
         </div>
 

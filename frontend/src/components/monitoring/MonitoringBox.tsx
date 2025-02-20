@@ -12,12 +12,12 @@ interface MonitoringBoxProps {
 }
 
 export const MonitoringBox = ({ machineName, machineData, isConnected }: MonitoringBoxProps) => {
-  const { machineTagsMap } = useMachineStore();
+  const { machineTagsMap, isLayoutMode } = useMachineStore();
   const { openControlModal, selectedMachine } = useModalStore();
   const selectedTags = machineTagsMap[machineName]?.selectedTags || [];
 
   const handleBoxClick = () => {
-    if (isConnected) {
+    if (isConnected && !isLayoutMode) {
       openControlModal(machineName, machineData);
     }
   };
@@ -28,7 +28,7 @@ export const MonitoringBox = ({ machineName, machineData, isConnected }: Monitor
     <div 
       className={`relative border-2 border-black p-2 rounded-lg bg-gray-50 shadow-md cursor-pointer hover:shadow-lg transition-all duration-500 ${
         selectedMachine ? (isSelected ? 'z-[99] opacity-100 border-4 scale-105 border-black' : 'opacity-30') : 'opacity-100'
-      }`}
+      } ${isLayoutMode ? 'cursor-move' : ''}`}
       onClick={handleBoxClick}
     >
       <div className={`${getBackgroundColor(machineName)} text-white px-2 py-1 text-lg flex justify-between items-center`}>
