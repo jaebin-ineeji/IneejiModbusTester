@@ -1,7 +1,9 @@
 import { MachineManager } from '@/components/MachineManager';
 import { MonitoringGrid } from '@/components/monitoring/MonitoringGrid';
+import { ControlModal } from '@/components/monitoring/modals/ControlModal';
 import { machineApi } from '@/services/api';
 import { useMachineStore } from '@/store/machine';
+import { useModalStore } from '@/store/modal';
 import { useWebSocketStore } from '@/store/websocket';
 import { MonitoringRequest } from '@/types/monitoring';
 import { useEffect } from 'react';
@@ -21,6 +23,7 @@ export function MonitoringPage() {
   } = useMachineStore();
   
   const { isConnected, connect, reconnect, monitoringData, error, sendMessage } = useWebSocketStore();
+  const { isControlModalOpen, selectedMachine, machineData, closeControlModal } = useModalStore();
 
   useEffect(() => {
     connect();
@@ -173,6 +176,15 @@ export function MonitoringPage() {
           isLayoutMode={isLayoutMode}
         />
       </div>
+
+      {isControlModalOpen && selectedMachine && machineData && (
+        <ControlModal
+          isOpen={true}
+          onClose={closeControlModal}
+          machineName={selectedMachine}
+          machineData={machineData}
+        />
+      )}
     </div>
   );
 } 

@@ -1,6 +1,8 @@
 import { machineApi } from '@/services/api';
 import { useMachineStore } from '@/store/machine';
 import { MachineData, Permission, TagType } from '@/types/monitoring';
+import * as Dialog from '@radix-ui/react-dialog';
+import { Cross2Icon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
 interface ControlModalProps {
@@ -132,45 +134,64 @@ export const ControlModal = ({ isOpen, onClose, machineName, machineData }: Cont
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-96">
-        <h2 className="text-xl font-bold mb-4">{machineName} 제어</h2>
-        {error && (
-          <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
+    <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-overlayShow z-[100]" />
+        <Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] bg-white rounded-lg shadow-[0_0_32px_0_rgba(0,0,0,0.16)] p-6 w-[400px] max-h-[85vh] overflow-y-auto data-[state=open]:animate-contentShow focus:outline-none z-[101]">
+          <div className="flex items-center justify-between mb-4">
+            <Dialog.Title className="text-xl font-bold">
+              {machineName} 제어
+            </Dialog.Title>
+            <Dialog.Close asChild>
+              <button
+                className="rounded-full h-6 w-6 inline-flex items-center justify-center text-gray-500 hover:text-gray-700 focus:outline-none"
+                aria-label="Close"
+              >
+                <Cross2Icon />
+              </button>
+            </Dialog.Close>
           </div>
-        )}
-        {writableTags.length > 0 ? (
-          <div className="space-y-4">
-            {writableTags.map(tag => (
-              <div key={tag} className="flex items-center justify-between">
-                <label className="font-medium">{tag}</label>
-                {renderTagInput(tag)}
-              </div>
-            ))}
+
+          {error && (
+            <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+
+          {writableTags.length > 0 ? (
+            <div className="space-y-4">
+              {writableTags.map(tag => (
+                <div key={tag} className="flex items-center justify-between">
+                  <label className="font-medium">{tag}</label>
+                  {renderTagInput(tag)}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-500 text-center py-4">
+              제어 가능한 태그가 없습니다.
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2 mt-6">
+            <Dialog.Close asChild>
+              <button
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                disabled={isSubmitting}
+              >
+                취소
+              </button>
+            </Dialog.Close>
+            <button
+              onClick={handleSubmit}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-400"
+              disabled={writableTags.length === 0 || isSubmitting || Object.keys(controlValues).length === 0}
+            >
+              {isSubmitting ? '처리 중...' : '적용'}
+            </button>
           </div>
-        ) : (
-          <div className="text-gray-500 text-center py-4">
-            제어 가능한 태그가 없습니다.
-          </div>
-        )}
-        <div className="flex justify-end gap-2 mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-            disabled={isSubmitting}
-          >
-            취소
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
-            disabled={writableTags.length === 0 || isSubmitting || Object.keys(controlValues).length === 0}
-          >
-            {isSubmitting ? '처리 중...' : '적용'}
-          </button>
-        </div>
-      </div>
-    </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }; 
