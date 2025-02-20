@@ -44,7 +44,7 @@ export function MachineList({
               {selectedMachine === machine && (
                 <button
                   onClick={onDeleteMachine}
-                  className="ml-2 px-2 py-1 text-sm text-red-600 hover:bg-red-50 rounded"
+                  className="ml-2 px-2 py-1 text-sm text-red-600 hover:bg-red-50 rounded border-2 border-red-300"
                 >
                   삭제
                 </button>
