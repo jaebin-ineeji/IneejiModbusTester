@@ -12,7 +12,7 @@
   "scripts": {
     "start": "electron .",
     "build:win": "npm run copy-dist && electron-builder --win --publish always",
-    "build:mac": "npm run copy-dist && electron-builder --mac --publish always",
+    "build:mac": "node scripts/build.js --mac",
     "build:linux": "npm run copy-dist && electron-builder --linux --publish always",
     "build:all": "npm run copy-dist && electron-builder --win --mac --linux --publish always",
     "copy-dist": "cp -r ../frontend/dist ./dist"
@@ -27,7 +27,8 @@
         "provider": "github",
         "owner": "jaebin-ineeji",
         "repo": "IneejiModbusTester",
-        "private": true
+        "private": true,
+        "releaseType": "release"
       }
     ],
     "appId": "ineeji.modbus.test.app",

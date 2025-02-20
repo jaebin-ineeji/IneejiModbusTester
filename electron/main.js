@@ -57,14 +57,6 @@ function checkForUpdates() {
         console.log('개발 환경에서는 업데이트를 체크하지 않습니다.');
         return;
     }
-    autoUpdater.setFeedURL({
-        provider: 'github',
-        owner: 'jaebin-ineeji',
-        repo: 'IneejiModbusTester',
-        private: true,
-        token: process.env.GH_TOKEN,  // 환경변수에서 토큰 가져오기
-        releaseType: 'release'  // 추가
-    });
     
     autoUpdater.autoDownload = true; // 자동 다운로드 활성화
     autoUpdater.checkForUpdatesAndNotify(); // 업데이트 확인 및 알림
