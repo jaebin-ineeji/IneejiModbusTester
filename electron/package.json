@@ -1,6 +1,6 @@
 {
   "name": "ineeji-modbus-test-app",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": {
     "name": "Jaebin Sa",
     "email": "jaebin@ineeji.com"
@@ -16,6 +16,7 @@
     "build:linux": "node scripts/build.js --linux",
     "build:all": "node scripts/build.js --all",
     "copy-dist": "cp -r ../frontend/dist ./dist",
+    "build:mac-local": "rm -rf ./dist && npm run build:front && npm run copy-dist && electron-builder --mac",
     "build:front": "cd ../frontend && npm run build:electron"
   },
   "repository": {
@@ -34,6 +35,7 @@
     ],
     "appId": "ineeji.modbus.test.app",
     "productName": "Ineeji Modbus Tester",
+    "copyright": "Copyright © 2025 Jaebin Sa",
     "files": [
       "main.js",
       "dist/**/*"
@@ -49,6 +51,13 @@
       ],
       "icon": "build/icon/ineeji_logo.png"
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Ineeji Modbus Tester"
+    },
     "mac": {
       "target": [
         "dmg",
@@ -62,7 +71,16 @@
         "AppImage",
         "deb"
       ],
-      "icon": "build/icon/ineeji_logo.png"
+      "icon": "build/icon/linux-icons",
+      "category": "Utility",
+      "synopsis": "Modbus 테스트 도구",
+      "description": "인이지 테스트 및 모니터링 도구",
+      "desktop": {
+        "Name": "Ineeji Modbus Tester",
+        "Comment": "인이지 테스터",
+        "Categories": "Development;Utility;",
+        "Terminal": false
+      }
     }
   },
   "dependencies": {
