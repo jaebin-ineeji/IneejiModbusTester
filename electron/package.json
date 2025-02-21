@@ -1,6 +1,6 @@
 {
   "name": "ineeji-modbus-test-app",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": {
     "name": "Jaebin Sa",
     "email": "jaebin@ineeji.com"
@@ -81,6 +81,11 @@
         "Categories": "Development;Utility;",
         "Terminal": false
       }
+    },
+    "appImage": {
+      "synopsis": "Modbus 테스트 도구",
+      "artifactName": "${productName}-${version}-${arch}-ubuntu-${env.UBUNTU_VERSION}.AppImage",
+      "category": "Development"
     }
   },
   "dependencies": {

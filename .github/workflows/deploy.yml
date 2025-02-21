@@ -13,7 +13,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        include:
+          - os: macos-latest
+            node-version: '20'
+          - os: ubuntu-latest
+            node-version: '20'
+          - os: windows-latest
+            node-version: '20'
+          - os: ubuntu-18.04
+            node-version: '16'  # Ubuntu 18.04용 안정적인 Node 버전
     
     steps:
       - uses: actions/checkout@v4
@@ -21,8 +29,22 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          
+          node-version: ${{ matrix.node-version }}
+
+      # Ubuntu 18.04 전용 시스템 의존성 설치
+      - name: Install Ubuntu 18.04 dependencies
+        if: matrix.os == 'ubuntu-18.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgconf-2-4 \
+            libxss1 \
+            libxtst6 \
+            libnotify4 \
+            libnss3 \
+            gcc-multilib \
+            g++-multilib
+
       # Frontend 빌드
       - name: Install Frontend dependencies
         working-directory: ./frontend
@@ -36,13 +58,28 @@ jobs:
       - name: Install Electron dependencies
         working-directory: ./electron
         run: npm install
-        
+
+      # Ubuntu 18.04 전용 빌드 설정
+      - name: Build and publish (Ubuntu 18.04)
+        if: matrix.os == 'ubuntu-18.04'
+        working-directory: ./electron
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          USE_SYSTEM_FPM: true
+          NODE_OPTIONS: --max-old-space-size=4096
+          UBUNTU_VERSION: '18.04'
+        run: |
+          # AppImage 빌드를 위한 추가 설정
+          export ELECTRON_BUILDER_EXTRA_ARGS="--linux AppImage"
+          npm run build:linux
+
       - name: Build and publish
         working-directory: ./electron
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          UBUNTU_VERSION: '20.04'
         shell: bash
-        if: matrix.os != 'windows-latest'
+        if: matrix.os != 'windows-latest' && matrix.os != 'ubuntu-18.04'
         run: |
           if [ "${{ matrix.os }}" = "macos-latest" ]; then
             npm run build:mac
